@@ -5,4 +5,6 @@
     <string name="cancel_login">Se canceló la operación</string>
     <string name="error_login">Ocurrió un error al ingresar</string>
     <string name="logout">Cerrar sesión</string>
+    <string name="app_label">app_label</string>
+    <string name="search_hint">search</string>
 </resources>

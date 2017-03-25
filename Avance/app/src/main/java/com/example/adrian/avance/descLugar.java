@@ -8,6 +8,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.RatingBar;
 import android.widget.TextView;
 
 public class descLugar extends AppCompatActivity {
@@ -16,7 +17,7 @@ public class descLugar extends AppCompatActivity {
 
 
     private TextView nombreEstablecimiento;
-    private TextView calificacion;
+    private RatingBar calificacionPromedio;
     private FloatingActionButton ruta;
 
     @Override
@@ -28,11 +29,11 @@ public class descLugar extends AppCompatActivity {
 
 
         nombre_Intitucion_lista = (CollapsingToolbarLayout) findViewById(R.id.toolbar_layout);
-       nombreEstablecimiento = (TextView) findViewById(R.id.nombreLugar);
-        calificacion = (TextView) findViewById(R.id.calificacion);
+        nombreEstablecimiento = (TextView) findViewById(R.id.nombreLugar);
 
 
 
+        nombreEstablecimiento.setText(getIntent().getStringExtra("nombreLugar"));
 
 
 

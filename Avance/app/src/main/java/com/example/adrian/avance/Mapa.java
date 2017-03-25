@@ -2,6 +2,7 @@ package com.example.adrian.avance;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
@@ -16,8 +17,14 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ListView;
+import android.widget.SearchView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -46,21 +53,26 @@ import com.google.android.gms.maps.model.PolylineOptions;
 
 import org.json.JSONArray;
 
+import java.util.ArrayList;
+
+import back.AdaptadorEstablecimiento;
+import back.Establecimiento;
 import cz.msebera.android.httpclient.HttpResponse;
 import cz.msebera.android.httpclient.client.HttpClient;
 import cz.msebera.android.httpclient.client.methods.HttpGet;
 import cz.msebera.android.httpclient.impl.client.DefaultHttpClient;
 import cz.msebera.android.httpclient.util.EntityUtils;
+import rest.ObtenerBusqueda;
 
 public class Mapa extends Fragment implements OnMapReadyCallback, GoogleApiClient.OnConnectionFailedListener,
-        GoogleApiClient.ConnectionCallbacks, LocationListener {
+        GoogleApiClient.ConnectionCallbacks, LocationListener, android.widget.SearchView.OnQueryTextListener, MenuItem.OnActionExpandListener{
 
     private GoogleMap mapa;
 
     private Double longitudReferencia = -72.6377405;
     private Double latitudReferencia = -38.7290173;
     private FloatingActionButton locacionCercana;
-
+    private ArrayList<Establecimiento> establecimientos = new ArrayList<>();
 
     private static final String LOGTAG = "android-localizacion";
     private LocationRequest locRequest;
@@ -68,6 +80,26 @@ public class Mapa extends Fragment implements OnMapReadyCallback, GoogleApiClien
     private static final int PETICION_CONFIG_UBICACION = 201;
     private GoogleApiClient apiClient;
 
+
+    private String url="http://192.168.1.36/InclusivApp/controllers/establecimiento.php";
+    //prueba lista paises
+    private ArrayList<Establecimiento> establecimientosBusqueda = new ArrayList<>();
+
+    private Context mContext;
+    ListView listView;
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mContext = getActivity();
+        setHasOptionsMenu(true);
+
+
+    }
+    @Override
+    public void onDetach() {
+        super.onDetach();
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -91,12 +123,9 @@ public class Mapa extends Fragment implements OnMapReadyCallback, GoogleApiClien
         TareaWSObtener tarea = new TareaWSObtener();
         tarea.execute();
 
-        Toast toast = Toast.makeText(getContext(), tarea.nombre, Toast.LENGTH_LONG);
-        toast.show();
 
-        //LatLng referencia = new LatLng(tarea.latitud,tarea.longitud);
-       // mapa.addMarker(new MarkerOptions().position(referencia).title(tarea.nombre)
-            //    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)).flat(true));
+
+
 
 
         locacionCercana = (FloatingActionButton) view.findViewById(R.id.fBtnLocation);
@@ -111,6 +140,7 @@ public class Mapa extends Fragment implements OnMapReadyCallback, GoogleApiClien
 
                 mapa.addMarker(new MarkerOptions().position(referencia).title("Tu estas aquí")
                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)).flat(true));
+
                 CameraPosition cameraPosition =  new CameraPosition.Builder()
                         .target(referencia)
                         .zoom(15)
@@ -129,10 +159,32 @@ public class Mapa extends Fragment implements OnMapReadyCallback, GoogleApiClien
 
 
 
+        listView = (ListView) view.findViewById(R.id.list_buscar_mapa);
+        TextView emptyTextView = (TextView) view.findViewById(R.id.vacio);
+        listView.setEmptyView(emptyTextView);
+
+
         return view;
 
 
     }
+
+
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.buscar_menu, menu);
+        MenuItem searchItem = menu.findItem(R.id.action_search);
+        SearchView searchView = (SearchView) searchItem.getActionView();
+        searchView.setOnQueryTextListener(this);
+        searchView.setQueryHint("Search");
+
+        super.onCreateOptionsMenu(menu, inflater);
+
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+
 
     @Override
     public void onMapReady(GoogleMap map) {
@@ -169,12 +221,9 @@ public class Mapa extends Fragment implements OnMapReadyCallback, GoogleApiClien
 
 
 
-
-
-
-
             }
         });
+
 
         mapa.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
@@ -183,9 +232,16 @@ public class Mapa extends Fragment implements OnMapReadyCallback, GoogleApiClien
                         .add(new LatLng(latitudReferencia,longitudReferencia))
                         .add(marker.getPosition());
 
+
                 Polyline polyline = mapa.addPolyline(rectOptions);
 
+
+                Establecimiento establecimiento = buscarEstablecimientoPorltdlgt(marker.getPosition().latitude,marker.getPosition().longitude);
+
                 Intent intent = new Intent(getContext(),descLugar.class);
+
+
+                intent.putExtra("nombreLugar", establecimiento.getNombre());
                 startActivity( intent );
 
 
@@ -355,14 +411,49 @@ public class Mapa extends Fragment implements OnMapReadyCallback, GoogleApiClien
         }
     }
 
+    // metodos del busacaddor
+
+    @Override
+    public boolean onMenuItemActionExpand(MenuItem menuItem) {
+        return false;
+    }
+
+    @Override
+    public boolean onMenuItemActionCollapse(MenuItem menuItem) {
+
+
+        return false;
+    }
+
+    @Override
+    public boolean onQueryTextSubmit(String s) {
+        return false;
+    }
+
+    @Override
+    public boolean onQueryTextChange(String newText) {
+
+        ObtenerBusqueda obtenerBusqueda = new ObtenerBusqueda(getContext());
+        obtenerBusqueda.setBusqueda(newText);
+        obtenerBusqueda.execute();
+
+        Toast toast2 = Toast.makeText(getContext(), obtenerBusqueda.getEstablecimientosBusqueda().get(0).getNombre(), Toast.LENGTH_LONG);
+        toast2.show();
+        AdaptadorEstablecimiento adaptadorEstablecimiento = new AdaptadorEstablecimiento(getActivity(),
+                obtenerBusqueda.getEstablecimientosBusqueda());
+
+
+        listView.setAdapter(adaptadorEstablecimiento);
+
+        return false;
+    }
+
+
+
 
 
     private class TareaWSObtener extends AsyncTask<String,Integer,Boolean> {
 
-        private double longitud;
-        private double latitud;
-        private String nombre;
-        private String valoracion;
 
         protected Boolean doInBackground(String... params) {
 
@@ -373,7 +464,7 @@ public class Mapa extends Fragment implements OnMapReadyCallback, GoogleApiClien
 
 
             HttpGet del =
-                    new HttpGet("http://inclusivapp.esy.es/controllers/establecimiento.php");
+                    new HttpGet(url);
 
 
             //del.setHeader("content-type", "application/json");
@@ -386,13 +477,24 @@ public class Mapa extends Fragment implements OnMapReadyCallback, GoogleApiClien
                 JSONArray array = new JSONArray(respStr);
 
 
-                Toast toast2 = Toast.makeText(getContext(), "3434535"+respStr, Toast.LENGTH_LONG);
-                toast2.show();
 
-                nombre = array.getJSONObject(0).getString("nombre");
-                valoracion =array.getJSONObject(0).getString("valoracion");
-                longitud = array.getJSONObject(0).getDouble("longitud");
-                latitud = array.getJSONObject(0).getDouble("latitud");
+                for (int i = 0; i<array.length(); i++) {
+
+                    Establecimiento establecimiento = new Establecimiento();
+
+                    establecimiento.setNombre(array.getJSONObject(i).getString("nombre"));
+                    establecimiento.setCalle(array.getJSONObject(i).getString("calle"));
+                    establecimiento.setCategoria(array.getJSONObject(i).getString("cod_categoria"));
+                    establecimiento.setTelefono(array.getJSONObject(i).getString("telefono"));
+                    establecimiento.setSitioWeb(array.getJSONObject(i).getString("sitio_web"));
+                    establecimiento.setLatitud(array.getJSONObject(i).getDouble("latitud"));
+                    establecimiento.setLongitud(array.getJSONObject(i).getDouble("longitud"));
+                    establecimiento.setValoracion(array.getJSONObject(i).getString("valoracion"));
+                    establecimiento.setNota(array.getJSONObject(i).getString("nota"));
+
+                    establecimientos.add(establecimiento);
+                }
+
             }
             catch(Exception ex)
             {
@@ -407,10 +509,94 @@ public class Mapa extends Fragment implements OnMapReadyCallback, GoogleApiClien
 
             if (result)
             {
+                if  (establecimientos  != null) {
+//                    Toast toast2 = Toast<.makeText(getContext(), "" + establecimientos.get(0).getNombre(), Toast.LENGTH_LONG);
+                    //toast2.show();
 
+                    addEstablecimientos(establecimientos);
+                }
             }
         }
     }
+
+
+
+
+
+    public void addEstablecimientos(ArrayList<Establecimiento> establecimiento){
+
+        for (int i=0; i<establecimiento.size(); i++) {
+
+
+
+            switch (establecimientos.get(i).getCategoria()){
+                case "1" :
+                    LatLng referencia = new LatLng(establecimientos.get(i).getLatitud(), establecimiento.get(i).getLongitud());
+                    mapa.addMarker(new MarkerOptions().position(referencia).title(establecimiento.get(i).getNombre())
+                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_centrocomercial)).flat(true));
+
+                    break;
+                case "2" :
+                    LatLng referencia2 = new LatLng(establecimientos.get(i).getLatitud(), establecimiento.get(i).getLongitud());
+                    mapa.addMarker(new MarkerOptions().position(referencia2).title(establecimiento.get(i).getNombre())
+                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_farmacia)).flat(true));
+
+                    break;
+                case "3" :
+                    LatLng referencia3 = new LatLng(establecimientos.get(i).getLatitud(), establecimiento.get(i).getLongitud());
+                    mapa.addMarker(new MarkerOptions().position(referencia3).title(establecimiento.get(i).getNombre())
+                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_banco)).flat(true));
+
+                    break;
+                case "4" :
+                    LatLng referencia4 = new LatLng(establecimientos.get(i).getLatitud(), establecimiento.get(i).getLongitud());
+                    mapa.addMarker(new MarkerOptions().position(referencia4).title(establecimiento.get(i).getNombre())
+                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_supermercado)).flat(true));
+
+                    break;
+                case "5" :
+                    LatLng referencia5 = new LatLng(establecimientos.get(i).getLatitud(), establecimiento.get(i).getLongitud());
+                    mapa.addMarker(new MarkerOptions().position(referencia5).title(establecimiento.get(i).getNombre())
+                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_restaurant)).flat(true));
+
+                    break;
+                case "6" :
+                    LatLng referencia6 = new LatLng(establecimientos.get(i).getLatitud(), establecimiento.get(i).getLongitud());
+                    mapa.addMarker(new MarkerOptions().position(referencia6).title(establecimiento.get(i).getNombre())
+                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_estacionamiento)).flat(true));
+
+                    break;
+                case "7" :
+                    LatLng referencia7 = new LatLng(establecimientos.get(i).getLatitud(), establecimiento.get(i).getLongitud());
+                    mapa.addMarker(new MarkerOptions().position(referencia7).title(establecimiento.get(i).getNombre())
+                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_hotel)).flat(true));
+
+                    break;
+                case "8" :
+                    LatLng referencia8 = new LatLng(establecimientos.get(i).getLatitud(), establecimiento.get(i).getLongitud());
+                    mapa.addMarker(new MarkerOptions().position(referencia8).title(establecimiento.get(i).getNombre())
+                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_iconservicios)).flat(true));
+
+                    break;
+            }
+
+        }
+    }
+
+
+    public Establecimiento buscarEstablecimientoPorltdlgt(double latitud,double longitud){
+        Establecimiento respuesta = null;
+        for (int i=0; i<this.establecimientos.size();i++){
+            if  (establecimientos.get(i).getLatitud() == latitud && establecimientos.get(i).getLongitud() == longitud){
+                respuesta = establecimientos.get(i);
+            }
+
+
+        }
+
+        return respuesta;
+    }
+
 
 
 

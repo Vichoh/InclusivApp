@@ -12,6 +12,24 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
+    <ListView
+        android:id="@+id/list_buscar_mapa"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/white"
+        android:scrollbars="vertical"
+        android:divider="@android:color/transparent"
+        android:visibility="gone"
+        android:elevation="20dp"
+        />
+
+    <TextView
+        android:id="@+id/vacio"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="invisible"/>
+
 
 
     <android.support.design.widget.FloatingActionButton

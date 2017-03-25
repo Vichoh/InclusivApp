@@ -19,6 +19,8 @@ public class Establecimiento {
     private double latitud;
     private String nota;
     private String valoracion;
+    private long id;
+
 
     public Establecimiento(String valoracion, String calle, int numero, String ciudad, String categoria, String telefono, String sitioWeb, String email, double longitud, double latitud, String nota, String nombre) {
         this.valoracion = valoracion;
@@ -33,11 +35,37 @@ public class Establecimiento {
         this.latitud = latitud;
         this.nota = nota;
         this.nombre = nombre;
+
     }
 
     public Establecimiento() {
     }
 
+
+    public String getNota() {
+        return nota;
+    }
+
+
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+    public void setNota(String nota) {
+        this.nota = nota;
+    }
+
+    public String getValoracion() {
+        return valoracion;
+    }
+
+    public void setValoracion(String valoracion) {
+        this.valoracion = valoracion;
+    }
 
     public String getNombre() {
         return nombre;

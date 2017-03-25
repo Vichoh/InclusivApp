@@ -22,7 +22,7 @@ public class Categoria extends AppCompatActivity {
         final String longitud , latitud;
          longitud = getIntent().getStringExtra("longitud");
          latitud = getIntent().getStringExtra("latitud");
-        final String categorias [] = {"Banco", "Farmacia", "Centro Comercial", "Supermercado"};
+
         /*
         Seteando el adaptador al GridView
          */
@@ -39,7 +39,7 @@ public class Categoria extends AppCompatActivity {
                  */
 
                 Intent i = new Intent (Categoria.this, InfoLugar.class);
-                i.putExtra("categoria", categorias[position]);
+                i.putExtra("categoria", ""+position);
                 i.putExtra("longitud",longitud );
                 i.putExtra("latitud", latitud);
                 startActivity(i);

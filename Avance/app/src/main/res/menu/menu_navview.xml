@@ -3,7 +3,7 @@
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/menu_pagina_principal"
-            android:icon="@drawable/ic_menu_white_24dp"
+            android:icon="@drawable/ic_place_white_24dp"
             android:title="mapa"/>
 
     </group>
@@ -14,7 +14,7 @@
         <menu>
             <item
                 android:id="@+id/menu_cerrar_sesion"
-                android:icon="@drawable/ic_menu_white_24dp"
+                android:icon="@drawable/ic_power_settings_new_white_24dp"
                 android:title="Iniciar sesion"/>
 
         </menu>

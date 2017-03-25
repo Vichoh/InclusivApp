@@ -16,6 +16,9 @@ import android.widget.EditText;
 import android.widget.RatingBar;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -58,7 +61,11 @@ public class InfoLugar extends AppCompatActivity {
     private Spinner anchopuertaBano ;
     private SwitchCompat bandaAntiComod ;
     private SwitchCompat barrasApoyoComod ;
-    private Spinner lavamanos ;
+    private Spinner espacio ;
+    private SwitchCompat lavamanos ;
+
+    final String categorias [] = {"Centros Comerciales","Farmacias", "Bancos",
+            "Supermercados","Restaurantes" ,"Estacionamiento","Hoteles/Hostales" ,"Servivios",};
 
 
     @Override
@@ -71,11 +78,11 @@ public class InfoLugar extends AppCompatActivity {
 
 
         //obtener la categoria desde el activity anterior
-        String nombreCategoria = getIntent().getStringExtra("categoria");
+        final int nombreCategoria = Integer.parseInt(getIntent().getStringExtra("categoria"))+1;
         String latitude = getIntent().getStringExtra("latitud");
         String longitude = getIntent().getStringExtra("longitud");
         categoria = (TextView) findViewById(R.id.nombreCategia);
-        categoria.setText(nombreCategoria);
+        categoria.setText(categorias[nombreCategoria-1]);
 
 
         final String[] datos =
@@ -148,7 +155,7 @@ public class InfoLugar extends AppCompatActivity {
                     String yourCity = yourAddresses.get(0).getAddressLine(1);
 
                     String[] direccion;
-                    direccion = yourAddress.split("(?<=\\D)(?=\\d)|(?<=\\d)(?=\\D)");;
+                    direccion = yourAddress.split("(?<=\\D)(?=\\d)|(?<=\\d)(?=\\D)");
 
                     infoCalle.setText(direccion[0]);
                     infoNumero.setText(direccion[1]);
@@ -180,13 +187,14 @@ public class InfoLugar extends AppCompatActivity {
         anchopuertaBano =(Spinner) findViewById(R.id.opcionesAnchoPuertaBano);
         bandaAntiComod =(SwitchCompat) findViewById(R.id.SwichbandasAntiComodidades);
         barrasApoyoComod =(SwitchCompat) findViewById(R.id.SwichbarraApoyoComod);
-        lavamanos =(Spinner) findViewById(R.id.opcionesespacioBano);
+        espacio =(Spinner) findViewById(R.id.opcionesespacioBano);
+        lavamanos =(SwitchCompat) findViewById(R.id.SwichlavamanosAjustado);
 
 
         estadoRampa.setAdapter(adaptador);
         anchoPuerta.setAdapter(adaptador1);
         anchopuertaBano.setAdapter(adaptador2);
-        lavamanos.setAdapter(adaptador3);
+        espacio.setAdapter(adaptador3);
 
 
 
@@ -195,32 +203,35 @@ public class InfoLugar extends AppCompatActivity {
             public void onClick(View view) {
                 TareaWSInsertar tarea = new TareaWSInsertar();
                 tarea.execute(
-                        infoNombre.getText().toString(),
-                        infoCalle.getText().toString(),
-                        infoNumero.getText().toString(),
-                        categoria.getText().toString(),
-                        infoCiudad.getText().toString(),
-                        infoEmail.getText().toString(),
-                        infoWeb.getText().toString(),
-                        infoTelefono.getText().toString(),
-                        ""+yourLatitude,
-                        ""+yourLongitude,
-                        nota.getText().toString(),
-                        ""+valoracion.getRating(),
+                        infoNombre.getText().toString(),//0
+                        infoCalle.getText().toString(),//1
+                        infoNumero.getText().toString(),//2
+                        nombreCategoria+"",//3
+                        infoCiudad.getText().toString(),//4
+                        infoEmail.getText().toString(),//5
+                        infoWeb.getText().toString(),//6
+                        infoTelefono.getText().toString(),//7
+                        ""+yourLatitude,//8
+                        ""+yourLongitude,//9
+                        nota.getText().toString(),//10
+                        ""+valoracion.getRating(),//11
 
-                        estacionamientoDisc.getText().toString(),
-                        rampaAcceso.getText().toString(),
-                        estadoRampa.getSelectedItem().toString(),
-                        bandaAntiAcces.getText().toString(),
-                        barraApoyoAcces.getText().toString(),
+                        String.valueOf(estacionamientoDisc.isChecked()),//12
+                        String.valueOf(rampaAcceso.isChecked()),//13
+                        estadoRampa.getSelectedItem().toString(),//14
+                        String.valueOf(bandaAntiAcces.isChecked()),//15
+                        String.valueOf(barraApoyoAcces.isChecked()),//16
 
-                        anchoPuerta.getSelectedItem().toString(),
-                        banoDiscap.getText().toString(),
-                        anchopuertaBano.getSelectedItem().toString(),
-                        bandaAntiComod.getText().toString(),
-                        barrasApoyoComod.getText().toString(),
-                        lavamanos.getSelectedItem().toString()
+                        anchoPuerta.getSelectedItem().toString(),//17
+                        String.valueOf(banoDiscap.isChecked()),//18
+                        anchopuertaBano.getSelectedItem().toString(),//19
+                        String.valueOf(bandaAntiComod.isChecked()),//20
+                        String.valueOf(barrasApoyoComod.isChecked()),//21
+                        espacio.getSelectedItem().toString(),//22
+                        String.valueOf(lavamanos.isChecked())//23
                 );
+
+                Toast.makeText(getApplicationContext(),String.valueOf(estacionamientoDisc.isChecked()),Toast.LENGTH_LONG).show();
 
 
 
@@ -261,52 +272,102 @@ public class InfoLugar extends AppCompatActivity {
 
     private class TareaWSInsertar extends AsyncTask<String,Integer,Boolean> {
 
+        String respuesta;
+
         protected Boolean doInBackground(String... params) {
 
             boolean resul = true;
 
             HttpClient httpClient = new DefaultHttpClient();
 
-            HttpPost post = new HttpPost("http://inclusivapp.esy.es/controllers/establecimiento.php");
-            //post.setHeader("content-type", "application/json");
+            HttpPost post = new HttpPost("http://192.168.1.2/InclusivApp/controllers/establecimiento.php");
+                //post.setHeader("content-type", "application/json");
 
-            List<NameValuePair> datos = new ArrayList<>();
+                List<NameValuePair> datos = new ArrayList<>();
 
-            try
-            {
-                //Construimos el objeto cliente en formato JSON
+                try
+                {
+                    //Construimos el objeto cliente en formato JSON
 
-                datos.add(new BasicNameValuePair("nombre", params[0]));
-                datos.add(new BasicNameValuePair("calle",params[1]));
-                datos.add(new BasicNameValuePair("numero",params[2]));
-                datos.add(new BasicNameValuePair("cod_categoria",params[4]));
-                datos.add(new BasicNameValuePair("hora_in","0"));
-                datos.add(new BasicNameValuePair("hora_ter","0"));
-                datos.add(new BasicNameValuePair("telefono",params[7]));
-                datos.add(new BasicNameValuePair("sitio_web",params[6]));
-                datos.add(new BasicNameValuePair("latitud",params[8]));
-                datos.add(new BasicNameValuePair("longitud",params[9]));
-                datos.add(new BasicNameValuePair("nota",params[10]));
-                datos.add(new BasicNameValuePair("valoracion",params[11]));
-
-
-
-                post.setEntity(new UrlEncodedFormEntity(datos));
+                    datos.add(new BasicNameValuePair("nombre", params[0]));
+                    datos.add(new BasicNameValuePair("calle",params[1]));
+                    datos.add(new BasicNameValuePair("numero",params[2]));
+                    datos.add(new BasicNameValuePair("cod_categoria",params[3]));
+                    datos.add(new BasicNameValuePair("hora_in","0"));
+                    datos.add(new BasicNameValuePair("hora_ter","0"));
+                    datos.add(new BasicNameValuePair("telefono",params[7]));
+                    datos.add(new BasicNameValuePair("sitio_web",params[6]));
+                    datos.add(new BasicNameValuePair("latitud",params[8]));
+                    datos.add(new BasicNameValuePair("longitud",params[9]));
+                    datos.add(new BasicNameValuePair("nota",params[10]));
+                    datos.add(new BasicNameValuePair("valoracion",params[11]));
 
 
 
+                    post.setEntity(new UrlEncodedFormEntity(datos));
 
-                HttpResponse resp = httpClient.execute(post);
 
-                String respStr = EntityUtils.toString(resp.getEntity());
 
-                if(!respStr.equals("true"))
-                    resul = false;
+                    HttpResponse resp = httpClient.execute(post);
+
+                respuesta = EntityUtils.toString(resp.getEntity());
+
+                JSONObject jsonObject = new JSONObject(respuesta);
+
+                int cod_establecimiento = jsonObject.getInt("cod_establecimiento");
+
+
+
+                //
+                post = new HttpPost("http://192.168.1.2/InclusivApp/controllers/accesibilidad.php");
+
+                    datos = new ArrayList<>();
+
+                    datos.add(new BasicNameValuePair("cod_establecimiento", cod_establecimiento+""));
+                    datos.add(new BasicNameValuePair("estacionamiento", params[12]));
+                    datos.add(new BasicNameValuePair("rampa", params[13]));
+                    datos.add(new BasicNameValuePair("banda", params[15]));
+                    datos.add(new BasicNameValuePair("barra", params[16]));
+
+                    post.setEntity(new UrlEncodedFormEntity(datos));
+
+                     resp = httpClient.execute(post);
+
+
+                     respuesta = EntityUtils.toString(resp.getEntity());
+
+
+
+
+                    //
+                    post = new HttpPost("http://192.168.1.2/InclusivApp/controllers/comodidad.php");
+
+                    datos = new ArrayList<>();
+
+                    datos.add(new BasicNameValuePair("cod_establecimiento", cod_establecimiento+""));
+                    datos.add(new BasicNameValuePair("ancho_puerta", params[17]));
+                    datos.add(new BasicNameValuePair("bano", params[18]));
+                    datos.add(new BasicNameValuePair("banda", params[20]));
+                    //datos.add(new BasicNameValuePair("rampa", params[19]));
+                    datos.add(new BasicNameValuePair("barra", params[21]));
+                    datos.add(new BasicNameValuePair("espacio", params[22]));
+                    datos.add(new BasicNameValuePair("lavamano", params[23]));
+
+
+                    post.setEntity(new UrlEncodedFormEntity(datos));
+
+                    resp = httpClient.execute(post);
+
+
+                    respuesta = EntityUtils.toString(resp.getEntity());
+
+                resul = true;
             }
             catch(Exception ex)
             {
                 Log.e("ServicioRest","Error!", ex);
                 resul = false;
+                respuesta = ex.getMessage().toString();
             }
 
             return resul;
@@ -314,11 +375,14 @@ public class InfoLugar extends AppCompatActivity {
 
         protected void onPostExecute(Boolean result) {
 
-            if (result)
-            {
+            if(result){
+                Toast.makeText(getApplicationContext(),respuesta,Toast.LENGTH_LONG).show();
 
-
+            }else{
+                Toast.makeText(getApplicationContext(),respuesta,Toast.LENGTH_LONG).show();
             }
+
+
         }
     }
 

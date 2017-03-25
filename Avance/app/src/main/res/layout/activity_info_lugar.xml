@@ -198,7 +198,9 @@
             </android.support.design.widget.TextInputLayout>
 
 
-            <include layout="@layout/informacion"
+            <include
+
+                layout="@layout/informacion"
                 android:layout_height="wrap_content"
                 android:layout_width="match_parent"/>
 

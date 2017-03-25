@@ -26,7 +26,15 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".Principal" />
+        <activity android:name=".Principal">
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.app.searchable"
+                android:resource="@layout/searchable" />
+        </activity>
         <activity android:name=".Mapa" />
 
         <meta-data
@@ -40,7 +48,8 @@
         <activity android:name=".ImgLugar" />
         <activity android:name=".Categoria" />
         <activity android:name=".InfoLugar" />
-        <activity android:name=".Login"></activity>
+        <activity android:name=".Login" />
+        <activity android:name=".Busqueda" />
     </application>
 
 </manifest>

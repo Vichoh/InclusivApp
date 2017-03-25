@@ -17,8 +17,8 @@ public class ImagenAdapter extends BaseAdapter {
 
     // Array de identificadores
     private Integer[] mThumbIds = {
-            R.drawable.banco,R.drawable.comercial, R.drawable.supermercado,
-            R.drawable.farmacia
+            R.drawable.comercial,R.drawable.farmacia, R.drawable.banco,
+            R.drawable.supermercado,R.drawable.restaurantes,R.drawable.estacionamiento,R.drawable.hotel,R.drawable.servicios
     };
 
     public ImagenAdapter(Context c) {
