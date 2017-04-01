@@ -1,14 +1,21 @@
 package rest;
 
+import android.app.Activity;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.ListView;
 import android.widget.Toast;
+
+import com.example.adrian.avance.R;
 
 import org.json.JSONArray;
 
 import java.util.ArrayList;
 
+import back.AdaptadorEstablecimiento;
 import back.Establecimiento;
 import cz.msebera.android.httpclient.HttpResponse;
 import cz.msebera.android.httpclient.client.HttpClient;
@@ -22,16 +29,18 @@ import cz.msebera.android.httpclient.util.EntityUtils;
 
 public class ObtenerBusqueda extends AsyncTask<String,Integer,Boolean> {
 
-    private String url = "http://192.168.1.36/InclusivApp/controllers/busqueda.php";
+    private String url = "http://192.168.1.243/InclusivApp/controllers/establecimiento.php";
     private ArrayList<Establecimiento> establecimientosBusqueda = new ArrayList<>();
     private String busqueda;
     private String respStr;
     private Context context;
+    private Activity activity;
 
 
 
-    public ObtenerBusqueda(Context context) {
+    public ObtenerBusqueda(Context context, Activity activity) {
         this.context = context;
+        this.activity = activity;
     }
 
     public String getBusqueda() {
@@ -121,7 +130,20 @@ public class ObtenerBusqueda extends AsyncTask<String,Integer,Boolean> {
                 toast2.show();
 
 
+                AdaptadorEstablecimiento adaptadorEstablecimiento = new AdaptadorEstablecimiento(this.activity,
+                        establecimientosBusqueda);
 
+
+                View view;
+                LayoutInflater inf =(LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                //LayoutInflater inf =LayoutInflater.from(context);
+                view = inf.inflate(R.layout.activity_mapa, null);
+
+
+
+                ListView listView = (ListView) view.findViewById(R.id.list_buscar_mapa);
+
+                listView.setAdapter(adaptadorEstablecimiento);
             }
         }
     }

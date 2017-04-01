@@ -54,6 +54,7 @@
 
     <style name="progresBar" parent="Theme.AppCompat.Light">
         <item name="color">#2E7D32</item>
+
     </style>
 
 

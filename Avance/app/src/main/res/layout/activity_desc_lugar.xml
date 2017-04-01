@@ -100,6 +100,7 @@
             android:layout_gravity="left"
             android:theme="@style/RatingBar"
             android:layout_marginLeft="10dp"
+
             />
 
         <LinearLayout
@@ -116,7 +117,7 @@
                 android:text="CALIFICACIÓN DE INFRAESTRUCTURA"
                 android:textAlignment="center"
                 android:paddingTop="30dp"
-                android:textSize="18dp"/>
+                android:textSize="15dp"/>
 
 
             <LinearLayout
@@ -145,19 +146,22 @@
                             android:layout_height="match_parent">
                             <ProgressBar
                                 android:layout_width="match_parent"
-                                android:layout_height="125dp"
+                                android:layout_height="100dp"
                                 android:id="@+id/progress_bar_accesibilidad"
                                 android:indeterminate="false"
                                 android:layout_gravity="center"
                                 android:theme="@style/progresBar"
-                                style="@style/Widget.AppCompat.ProgressBar"
+                                style="?android:attr/progressBarStyleHorizontal"
                                 android:max="5"
+                                android:progress="4"
+                                android:progressDrawable="@drawable/progress_circle"
+                                android:rotation="-90"
 
                                 />
 
                             <LinearLayout
                                 android:layout_width="match_parent"
-                                android:layout_height="125dp"
+                                android:layout_height="100dp"
                                 android:orientation="horizontal"
                                 android:gravity="center">
 
@@ -167,7 +171,7 @@
                                     android:text="4.5"
                                     android:gravity="center|right"
                                     android:layout_weight="1"
-                                    android:textSize="24dp"
+                                    android:textSize="20dp"
                                     android:textColor="@android:color/black"
                                     android:id="@+id/valoracion_centro_accesibilidad"
                                     />
@@ -180,7 +184,7 @@
                                     >
 
                                     <ImageView
-                                        android:layout_width="30dp"
+                                        android:layout_width="25dp"
                                         android:layout_height="match_parent"
                                         android:src="@drawable/ic_star_rate_black_18dp"
 
@@ -220,20 +224,23 @@
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent">
                             <ProgressBar
-                                android:layout_width="match_parent"
-                                android:layout_height="125dp"
-                                android:id="@+id/progress_bar_comodidad"
-                                android:indeterminate="false"
-                                android:layout_gravity="center"
-                                android:theme="@style/progresBar"
-                                style="@style/Widget.AppCompat.ProgressBar"
-                                android:max="5"
+                            android:layout_width="match_parent"
+                            android:layout_height="100dp"
+                            android:id="@+id/progress_bar_comodidad"
+                            android:indeterminate="false"
+                            android:layout_gravity="center"
+                            android:theme="@style/progresBar"
+                            style="?android:attr/progressBarStyleHorizontal"
+                            android:max="10"
+                            android:progress="9"
+                            android:progressDrawable="@drawable/progress_circle"
+                            android:rotation="-90"
 
-                                />
+                            />
 
                             <LinearLayout
                                 android:layout_width="match_parent"
-                                android:layout_height="125dp"
+                                android:layout_height="100dp"
                                 android:orientation="horizontal"
                                 android:gravity="center">
 
@@ -243,7 +250,7 @@
                                     android:text="4.5"
                                     android:gravity="center|right"
                                     android:layout_weight="1"
-                                    android:textSize="24dp"
+                                    android:textSize="20dp"
                                     android:textColor="@android:color/black"
                                     android:id="@+id/valoracion_centro_comodidad"
                                     />
@@ -256,7 +263,7 @@
                                     >
 
                                     <ImageView
-                                        android:layout_width="30dp"
+                                        android:layout_width="25dp"
                                         android:layout_height="match_parent"
                                         android:src="@drawable/ic_star_rate_black_18dp"
 

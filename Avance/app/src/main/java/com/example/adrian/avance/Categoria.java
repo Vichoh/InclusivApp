@@ -27,6 +27,7 @@ public class Categoria extends AppCompatActivity {
         Seteando el adaptador al GridView
          */
         GridView gridview = (GridView) findViewById(R.id.GridCategoria);
+
         gridview.setAdapter(new ImagenAdapter(this));
 
         /*

@@ -25,7 +25,6 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -55,7 +54,6 @@ import org.json.JSONArray;
 
 import java.util.ArrayList;
 
-import back.AdaptadorEstablecimiento;
 import back.Establecimiento;
 import cz.msebera.android.httpclient.HttpResponse;
 import cz.msebera.android.httpclient.client.HttpClient;
@@ -81,12 +79,12 @@ public class Mapa extends Fragment implements OnMapReadyCallback, GoogleApiClien
     private GoogleApiClient apiClient;
 
 
-    private String url="http://192.168.1.36/InclusivApp/controllers/establecimiento.php";
+    private String url="http://192.168.1.243/InclusivApp/controllers/establecimiento.php";
     //prueba lista paises
     private ArrayList<Establecimiento> establecimientosBusqueda = new ArrayList<>();
 
     private Context mContext;
-    ListView listView;
+     ListView listView;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -156,7 +154,6 @@ public class Mapa extends Fragment implements OnMapReadyCallback, GoogleApiClien
 
             }
         });
-
 
 
         listView = (ListView) view.findViewById(R.id.list_buscar_mapa);
@@ -433,17 +430,19 @@ public class Mapa extends Fragment implements OnMapReadyCallback, GoogleApiClien
     @Override
     public boolean onQueryTextChange(String newText) {
 
-        ObtenerBusqueda obtenerBusqueda = new ObtenerBusqueda(getContext());
+        final ObtenerBusqueda obtenerBusqueda = new ObtenerBusqueda(getContext(),getActivity());
         obtenerBusqueda.setBusqueda(newText);
         obtenerBusqueda.execute();
 
-        Toast toast2 = Toast.makeText(getContext(), obtenerBusqueda.getEstablecimientosBusqueda().get(0).getNombre(), Toast.LENGTH_LONG);
-        toast2.show();
-        AdaptadorEstablecimiento adaptadorEstablecimiento = new AdaptadorEstablecimiento(getActivity(),
-                obtenerBusqueda.getEstablecimientosBusqueda());
 
 
-        listView.setAdapter(adaptadorEstablecimiento);
+        //Toast toast2 = Toast.makeText(getContext(), obtenerBusqueda.getEstablecimientosBusqueda().get(0).getNombre(), Toast.LENGTH_LONG);
+       // toast2.show();
+        //AdaptadorEstablecimiento adaptadorEstablecimiento = new AdaptadorEstablecimiento(getActivity(),
+              //  obtenerBusqueda.getEstablecimientosBusqueda());
+
+
+        //listView.setAdapter(adaptadorEstablecimiento);
 
         return false;
     }
@@ -510,8 +509,8 @@ public class Mapa extends Fragment implements OnMapReadyCallback, GoogleApiClien
             if (result)
             {
                 if  (establecimientos  != null) {
-//                    Toast toast2 = Toast<.makeText(getContext(), "" + establecimientos.get(0).getNombre(), Toast.LENGTH_LONG);
-                    //toast2.show();
+                 //   Toast toast2 = Toast.makeText(getContext(), "" + establecimientos.get(0).getNombre(), Toast.LENGTH_LONG);
+                   // toast2.show();
 
                     addEstablecimientos(establecimientos);
                 }
