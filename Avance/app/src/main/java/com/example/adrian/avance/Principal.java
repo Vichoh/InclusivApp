@@ -10,14 +10,16 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.facebook.AccessToken;
 import com.facebook.Profile;
-import com.facebook.ProfileTracker;
 import com.facebook.login.LoginManager;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -27,6 +29,7 @@ public class Principal extends AppCompatActivity {
     private Toolbar toolbar;
     private ActionBar actionBar;
     private DrawerLayout drawerLayout;
+    private static final int RC_SIGN_IN = 0;
 
     private CircleImageView circleImageView;
     private TextView nombre_usuario, email_usuario;
@@ -40,11 +43,7 @@ public class Principal extends AppCompatActivity {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle("InclusivApp");
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
-        circleImageView =(CircleImageView) findViewById(R.id.profile_image);
-        nombre_usuario = (TextView)findViewById(R.id.nom_usuario);
-        email_usuario = (TextView)findViewById(R.id.correo_usuario);
+       // getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 
 
@@ -64,33 +63,6 @@ public class Principal extends AppCompatActivity {
 
 
         setupNavigationDrawerContent(navigationView);
-
-
-
-        if (AccessToken.getCurrentAccessToken() != null) {
-
-            ProfileTracker profileTracker = new ProfileTracker(){
-
-                @Override
-                protected void onCurrentProfileChanged(Profile oldProfile, Profile currentProfile) {
-                    stopTracking();
-                    Profile.setCurrentProfile(currentProfile);
-
-                  //  Toast.makeText(getApplicationContext(),Profile.getCurrentProfile().toString(),Toast.LENGTH_LONG).show();
-                    //Toast.makeText(getApplicationContext(),Profile.getCurrentProfile().getName(),Toast.LENGTH_LONG).show();
-
-                    nombre_usuario.setText(Profile.getCurrentProfile().getName()+" "+Profile.getCurrentProfile().getLastName());
-                    circleImageView.setImageURI(Profile.getCurrentProfile().getProfilePictureUri(200,200));
-                }
-
-            };
-
-            profileTracker.startTracking();
-
-
-
-
-        }
 
 
 
@@ -124,14 +96,17 @@ public class Principal extends AppCompatActivity {
                             case R.id.menu_cerrar_sesion:
                                 menuItem.setChecked(true);
 
-                                if (AccessToken.getCurrentAccessToken() == null) {
-                                    menuItem.setTitle("Cerrar Sesión");
-                                    goLoginScreen();
+                                if (AccessToken.getCurrentAccessToken() != null) {
+                                    menuItem.setTitle("Iniciar Sesión");
+                                    LoginManager.getInstance().logOut();
+
+
 
                                 }else{
 
-                                    LoginManager.getInstance().logOut();
-                                    menuItem.setTitle("Iniciar Sesión");
+
+                                    menuItem.setTitle("Cerrar Sesión");
+                                    goLoginScreen();
                                 }
 
                                 drawerLayout.closeDrawer(GravityCompat.START);
@@ -160,6 +135,30 @@ public class Principal extends AppCompatActivity {
         drawerLayout.closeDrawer(GravityCompat.START);
     }
 
+    @Override
+
+    protected void onActivityResult (int requestCode, int resultCode, Intent data){
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if(requestCode == RC_SIGN_IN){
+            if (resultCode == RESULT_OK){
+                Log.d("AUTH", Login.usuario.getCorreo());
+
+                circleImageView =(CircleImageView) findViewById(R.id.profile_image);
+                nombre_usuario = (TextView)findViewById(R.id.nom_usuario);
+                email_usuario = (TextView)findViewById(R.id.correo_usuario);
+
+                Profile profileDefault = Profile.getCurrentProfile();
+
+                nombre_usuario.setText(profileDefault.getLastName()+", "+profileDefault.getFirstName());
+               // email_usuario.setText(Login.usuario.getCorreo());
+                Glide.with(circleImageView.getContext()).load(profileDefault.getProfilePictureUri(100,100)).into(circleImageView);
+                Toast.makeText(getApplicationContext(), "Sesión iniciada", Toast.LENGTH_SHORT).show();
+            } else {
+                Log.d("AUTH", "NO AUTENTICADO");
+            }
+        }
+    }
 
 
 

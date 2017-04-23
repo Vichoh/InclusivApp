@@ -25,7 +25,14 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
@@ -47,28 +54,30 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.Polyline;
-import com.google.android.gms.maps.model.PolylineOptions;
 
 import org.json.JSONArray;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
+import back.AdaptadorEstablecimiento;
 import back.Establecimiento;
 import cz.msebera.android.httpclient.HttpResponse;
 import cz.msebera.android.httpclient.client.HttpClient;
 import cz.msebera.android.httpclient.client.methods.HttpGet;
 import cz.msebera.android.httpclient.impl.client.DefaultHttpClient;
 import cz.msebera.android.httpclient.util.EntityUtils;
-import rest.ObtenerBusqueda;
 
 public class Mapa extends Fragment implements OnMapReadyCallback, GoogleApiClient.OnConnectionFailedListener,
         GoogleApiClient.ConnectionCallbacks, LocationListener, android.widget.SearchView.OnQueryTextListener, MenuItem.OnActionExpandListener{
 
-    private GoogleMap mapa;
+    public static GoogleMap mapa;
 
-    private Double longitudReferencia = -72.6377405;
-    private Double latitudReferencia = -38.7290173;
+    private Double longitudReferencia = -72.6164245;
+    private Double latitudReferencia = -38.7457485;
+    private String markerLatitud = "-38.7339569";
+    private String markerLongitud = "-72.6109954";
     private FloatingActionButton locacionCercana;
     private ArrayList<Establecimiento> establecimientos = new ArrayList<>();
 
@@ -79,12 +88,16 @@ public class Mapa extends Fragment implements OnMapReadyCallback, GoogleApiClien
     private GoogleApiClient apiClient;
 
 
-    private String url="http://192.168.1.243/InclusivApp/controllers/establecimiento.php";
-    //prueba lista paises
-    private ArrayList<Establecimiento> establecimientosBusqueda = new ArrayList<>();
+    private String dirEstablecimiento="http://cffca80a.ngrok.io/InclusivApp/controllers/establecimiento.php";
+    private String dirBusqueda = "http://cffca80a.ngrok.io/InclusivApp/controllers/busqueda.php";
 
+    private ArrayList<Establecimiento> establecimientosBusqueda = new ArrayList<>();
+    ArrayList<Establecimiento> establecimientosBusquedaVacio = new ArrayList<>();
     private Context mContext;
-     ListView listView;
+    ListView listView;
+
+    private List<List<HashMap<String, String>>>  listaRutas;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -118,13 +131,9 @@ public class Mapa extends Fragment implements OnMapReadyCallback, GoogleApiClien
         mapFragment.getMapAsync(this);
 
 
-        TareaWSObtener tarea = new TareaWSObtener();
-        tarea.execute();
 
-
-
-
-
+        //DESCARGO TODOS LOS ESTABLECIMIENTOS Y LOS AGREGO AL MAPA
+        cargarEstablecimientos();
 
         locacionCercana = (FloatingActionButton) view.findViewById(R.id.fBtnLocation);
         locacionCercana.setOnClickListener(new View.OnClickListener() {
@@ -155,6 +164,14 @@ public class Mapa extends Fragment implements OnMapReadyCallback, GoogleApiClien
             }
         });
 
+        // rutas
+
+        //Rutas rutas = new Rutas(markerLatitud,markerLongitud,""+latitudReferencia,""+longitudReferencia,getContext());
+        //rutas.addRoutes();
+
+
+
+        //busqueda
 
         listView = (ListView) view.findViewById(R.id.list_buscar_mapa);
         TextView emptyTextView = (TextView) view.findViewById(R.id.vacio);
@@ -225,20 +242,31 @@ public class Mapa extends Fragment implements OnMapReadyCallback, GoogleApiClien
         mapa.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
-                PolylineOptions rectOptions = new PolylineOptions()
-                        .add(new LatLng(latitudReferencia,longitudReferencia))
-                        .add(marker.getPosition());
 
-
-                Polyline polyline = mapa.addPolyline(rectOptions);
 
 
                 Establecimiento establecimiento = buscarEstablecimientoPorltdlgt(marker.getPosition().latitude,marker.getPosition().longitude);
 
+                markerLatitud = ""+marker.getPosition().latitude;
+                markerLongitud = ""+marker.getPosition().longitude;
                 Intent intent = new Intent(getContext(),descLugar.class);
 
 
                 intent.putExtra("nombreLugar", establecimiento.getNombre());
+                intent.putExtra("valoracion_centro_accesibilidad", establecimiento.getNombre());
+                intent.putExtra("valoracion_centro_comodidad", establecimiento.getNombre());
+                intent.putExtra("direccionDesc", establecimiento.getCalle());
+                intent.putExtra("horariDesc", establecimiento.getNombre());
+                intent.putExtra("telefonoDesc", establecimiento.getTelefono());
+                intent.putExtra("calificacionPromedio", establecimiento.getNombre());
+                intent.putExtra("progress_bar_accesibilidad", establecimiento.getNombre());
+                intent.putExtra("progress_bar_comodidad", establecimiento.getNombre());
+                intent.putExtra("lat", ""+marker.getPosition().latitude);
+                intent.putExtra("lon", ""+marker.getPosition().longitude);
+                intent.putExtra("myLat", ""+latitudReferencia);
+                intent.putExtra("myLon", ""+longitudReferencia);
+                intent.putExtra("codCategoria", establecimiento.getCategoria());
+
                 startActivity( intent );
 
 
@@ -430,96 +458,90 @@ public class Mapa extends Fragment implements OnMapReadyCallback, GoogleApiClien
     @Override
     public boolean onQueryTextChange(String newText) {
 
-        final ObtenerBusqueda obtenerBusqueda = new ObtenerBusqueda(getContext(),getActivity());
-        obtenerBusqueda.setBusqueda(newText);
-        obtenerBusqueda.execute();
+
+        if (newText == null || newText.trim().isEmpty()) {
+            resetSearch();
+            return false;
+        }
+
+            Toast toast2 = Toast.makeText(getContext(), newText, Toast.LENGTH_LONG);
+            toast2.show();
+
+            final ObtenerBusqueda obtenerBusqueda = new ObtenerBusqueda(getContext(),getActivity());
+            obtenerBusqueda.setBusqueda(newText);
+            obtenerBusqueda.execute();
 
 
 
-        //Toast toast2 = Toast.makeText(getContext(), obtenerBusqueda.getEstablecimientosBusqueda().get(0).getNombre(), Toast.LENGTH_LONG);
-       // toast2.show();
-        //AdaptadorEstablecimiento adaptadorEstablecimiento = new AdaptadorEstablecimiento(getActivity(),
-              //  obtenerBusqueda.getEstablecimientosBusqueda());
 
-
-        //listView.setAdapter(adaptadorEstablecimiento);
 
         return false;
     }
+    public void resetSearch() {
+
+        AdaptadorEstablecimiento adaptadorEstablecimiento = new AdaptadorEstablecimiento(getActivity(),
+                establecimientosBusquedaVacio);
 
 
-
-
-
-    private class TareaWSObtener extends AsyncTask<String,Integer,Boolean> {
-
-
-        protected Boolean doInBackground(String... params) {
-
-            boolean resul = true;
-
-            HttpClient httpClient = new DefaultHttpClient();
-
-
-
-            HttpGet del =
-                    new HttpGet(url);
-
-
-            //del.setHeader("content-type", "application/json");
-
-            try
-            {
-                HttpResponse resp = httpClient.execute(del);
-                String respStr = EntityUtils.toString(resp.getEntity());
-
-                JSONArray array = new JSONArray(respStr);
-
-
-
-                for (int i = 0; i<array.length(); i++) {
-
-                    Establecimiento establecimiento = new Establecimiento();
-
-                    establecimiento.setNombre(array.getJSONObject(i).getString("nombre"));
-                    establecimiento.setCalle(array.getJSONObject(i).getString("calle"));
-                    establecimiento.setCategoria(array.getJSONObject(i).getString("cod_categoria"));
-                    establecimiento.setTelefono(array.getJSONObject(i).getString("telefono"));
-                    establecimiento.setSitioWeb(array.getJSONObject(i).getString("sitio_web"));
-                    establecimiento.setLatitud(array.getJSONObject(i).getDouble("latitud"));
-                    establecimiento.setLongitud(array.getJSONObject(i).getDouble("longitud"));
-                    establecimiento.setValoracion(array.getJSONObject(i).getString("valoracion"));
-                    establecimiento.setNota(array.getJSONObject(i).getString("nota"));
-
-                    establecimientos.add(establecimiento);
-                }
-
-            }
-            catch(Exception ex)
-            {
-                Log.e("ServicioRest","Error!", ex);
-                resul = false;
-            }
-
-            return resul;
-        }
-
-        protected void onPostExecute(Boolean result) {
-
-            if (result)
-            {
-                if  (establecimientos  != null) {
-                 //   Toast toast2 = Toast.makeText(getContext(), "" + establecimientos.get(0).getNombre(), Toast.LENGTH_LONG);
-                   // toast2.show();
-
-                    addEstablecimientos(establecimientos);
-                }
-            }
-        }
+        listView.setAdapter(adaptadorEstablecimiento);
     }
 
 
 
+
+
+    public void cargarEstablecimientos(){
+
+        //CREO LAS CONEXIONES
+        RequestQueue requestQueue = Volley.newRequestQueue(getContext());
+        StringRequest request = new StringRequest(Request.Method.GET,dirEstablecimiento,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+
+                        try {
+
+                            JSONArray array = new JSONArray(response.toString());
+
+                            for (int i = 0; i<array.length(); i++) {
+
+                                Establecimiento establecimiento = new Establecimiento();
+
+
+                                establecimiento.setNombre(array.getJSONObject(i).getString("nombre"));
+                                establecimiento.setCalle(array.getJSONObject(i).getString("calle"));
+                                establecimiento.setCategoria(array.getJSONObject(i).getString("cod_categoria"));
+                                establecimiento.setTelefono(array.getJSONObject(i).getString("telefono"));
+                                establecimiento.setSitioWeb(array.getJSONObject(i).getString("sitio_web"));
+                                establecimiento.setLatitud(array.getJSONObject(i).getDouble("latitud"));
+                                establecimiento.setLongitud(array.getJSONObject(i).getDouble("longitud"));
+                                establecimiento.setId(array.getJSONObject(i).getInt("cod_establecimiento"));
+                                establecimientos.add(establecimiento);
+                            }
+
+                            addEstablecimientos(establecimientos);
+                        }
+                        catch(Exception ex)
+                        {
+                            Toast.makeText(getContext(),"Error en la carga de establecimientos"+ex.getMessage(),Toast.LENGTH_SHORT).show();
+                        }
+
+
+
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+                Toast.makeText(getContext(),"error al cargar establecimientos"+error.toString(),Toast.LENGTH_SHORT).show();
+
+
+            }
+        });
+
+        requestQueue.add(request);
+
+    }
 
 
     public void addEstablecimientos(ArrayList<Establecimiento> establecimiento){
@@ -599,5 +621,113 @@ public class Mapa extends Fragment implements OnMapReadyCallback, GoogleApiClien
 
 
 
+
+
+
+
+
+
+    public class ObtenerBusqueda extends AsyncTask<String,Integer,Boolean> {
+
+        private String url = dirBusqueda;
+
+        private String busqueda;
+        private String respStr;
+        private Context context;
+        private Activity activity;
+
+
+
+        public ObtenerBusqueda(Context context, Activity activity) {
+            this.context = context;
+            this.activity = activity;
+            establecimientosBusqueda.clear();
+        }
+
+
+
+        public void setBusqueda(String busqueda) {
+            this.busqueda = busqueda;
+        }
+
+
+
+
+
+
+        @Override
+        protected Boolean doInBackground(String... strings) {
+            boolean resul = true;
+
+            HttpClient httpClient = new DefaultHttpClient();
+
+
+            HttpGet del =
+                    new HttpGet(url+"?busqueda="+this.busqueda);
+
+
+
+
+            //del.setHeader("content-type", "application/json");
+
+            try {
+                HttpResponse resp = httpClient.execute(del);
+                respStr = EntityUtils.toString(resp.getEntity());
+
+
+                JSONArray array = new JSONArray(respStr);
+
+
+                for (int i = 0; i < array.length(); i++) {
+
+                    Establecimiento establecimiento = new Establecimiento();
+
+                    establecimiento.setNombre(array.getJSONObject(i).getString("nombre"));
+                    establecimiento.setCalle(array.getJSONObject(i).getString("calle"));
+                    establecimiento.setCategoria(array.getJSONObject(i).getString("cod_categoria"));
+                    establecimiento.setTelefono(array.getJSONObject(i).getString("telefono"));
+                    establecimiento.setSitioWeb(array.getJSONObject(i).getString("sitio_web"));
+                    establecimiento.setLatitud(array.getJSONObject(i).getDouble("latitud"));
+                    establecimiento.setLongitud(array.getJSONObject(i).getDouble("longitud"));
+
+
+
+                    establecimientosBusqueda.add(establecimiento);
+                }
+
+
+
+
+
+            } catch (Exception ex) {
+                Log.e("ServicioRest", "Error!", ex);
+                resul = false;
+            }
+
+            return resul;
+        }
+
+        protected void onPostExecute(Boolean result) {
+
+            if (result) {
+                if (establecimientosBusqueda != null) {
+
+                    Toast toast2 = Toast.makeText(context, respStr, Toast.LENGTH_LONG);
+                    toast2.show();
+
+                    resetSearch();
+
+                    AdaptadorEstablecimiento adaptadorEstablecimiento = new AdaptadorEstablecimiento(this.activity,
+                            establecimientosBusqueda);
+
+
+                    listView.setAdapter(adaptadorEstablecimiento);
+                }
+            }
+        }
+
+
+
+    }
 }
 

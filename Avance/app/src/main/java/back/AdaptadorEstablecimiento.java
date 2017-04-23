@@ -22,6 +22,7 @@ public class AdaptadorEstablecimiento extends BaseAdapter {
     protected Activity activity;
     protected ArrayList<Establecimiento> establecimientoArrayList;
     Context context;
+    ImageView imageView;
 
     public AdaptadorEstablecimiento(Activity activity, ArrayList<Establecimiento> establecimientoArrayList){
 
@@ -60,8 +61,8 @@ public class AdaptadorEstablecimiento extends BaseAdapter {
         Establecimiento establecimiento = establecimientoArrayList.get(i);
 
 
-        ImageView imageView = (ImageView) v.findViewById(R.id.imagenLista);
-
+        imageView = (ImageView) v.findViewById(R.id.imagenLista);
+        addIconCategorias(establecimiento.getCategoria());
 
         TextView textViewNombre = (TextView) v.findViewById(R.id.nombreLugarLista);
         textViewNombre.setText(establecimiento.getNombre());
@@ -70,5 +71,56 @@ public class AdaptadorEstablecimiento extends BaseAdapter {
         textViewCalle.setText(establecimiento.getCalle()+ " "+ establecimiento.getNumero()+", "+establecimiento.getCiudad());
 
         return v;
+    }
+
+    public void addIconCategorias(String idCategoria){
+
+
+
+
+            switch (idCategoria){
+                case "1" :
+                    imageView.setImageResource(R.drawable.ic_centrocomercial);
+
+
+                    break;
+                case "2" :
+                    imageView.setImageResource(R.drawable.ic_farmacia);
+
+
+                    break;
+                case "3" :
+                    imageView.setImageResource(R.drawable.ic_banco);
+
+
+                    break;
+                case "4" :
+                    imageView.setImageResource(R.drawable.ic_supermercado);
+
+
+                    break;
+                case "5" :
+                    imageView.setImageResource(R.drawable.ic_restaurant);
+
+
+                    break;
+                case "6" :
+                    imageView.setImageResource(R.drawable.ic_estacionamiento);
+
+
+                    break;
+                case "7" :
+                    imageView.setImageResource(R.drawable.ic_hotel);
+
+
+                    break;
+                case "8" :
+                    imageView.setImageResource(R.drawable.ic_iconservicios);
+
+
+                    break;
+            }
+
+
     }
 }

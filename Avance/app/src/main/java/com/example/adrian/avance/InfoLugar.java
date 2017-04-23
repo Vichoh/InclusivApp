@@ -1,38 +1,57 @@
 package com.example.adrian.avance;
 
+import android.Manifest;
+import android.content.ClipData;
+import android.content.Intent;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.location.Address;
 import android.location.Geocoder;
-import android.os.AsyncTask;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
+import android.util.Base64;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+import com.facebook.AccessToken;
+import com.facebook.Profile;
+import com.squareup.picasso.Picasso;
+
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
-import cz.msebera.android.httpclient.HttpResponse;
-import cz.msebera.android.httpclient.NameValuePair;
-import cz.msebera.android.httpclient.client.HttpClient;
-import cz.msebera.android.httpclient.client.entity.UrlEncodedFormEntity;
-import cz.msebera.android.httpclient.client.methods.HttpPost;
-import cz.msebera.android.httpclient.impl.client.DefaultHttpClient;
-import cz.msebera.android.httpclient.message.BasicNameValuePair;
-import cz.msebera.android.httpclient.util.EntityUtils;
+import back.CircleTransform;
 
 public class InfoLugar extends AppCompatActivity {
 
@@ -63,9 +82,20 @@ public class InfoLugar extends AppCompatActivity {
     private SwitchCompat barrasApoyoComod ;
     private Spinner espacio ;
     private SwitchCompat lavamanos ;
+    private Button cargarImagenes;
+
+    private String servicio = "http://cffca80a.ngrok.io/InclusivApp/";
+    private String dirEstablecimiento = "controllers/establecimiento.php";
+    private String dirAccesibilidad = "controllers/accesibilidad.php";
+    private String dirComodidad = "controllers/comodidad.php";
+    private String dirImg = "controllers/img.php";
+    private ArrayList<String> imgsBit;
 
     final String categorias [] = {"Centros Comerciales","Farmacias", "Bancos",
             "Supermercados","Restaurantes" ,"Estacionamiento","Hoteles/Hostales" ,"Servivios",};
+
+
+    private ImageView imageViewPhoto;
 
 
     @Override
@@ -196,53 +226,295 @@ public class InfoLugar extends AppCompatActivity {
         anchopuertaBano.setAdapter(adaptador2);
         espacio.setAdapter(adaptador3);
 
+        cargarImagenes = (Button) findViewById(R.id.btnImg);
 
 
         enviarInfo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                TareaWSInsertar tarea = new TareaWSInsertar();
-                tarea.execute(
-                        infoNombre.getText().toString(),//0
-                        infoCalle.getText().toString(),//1
-                        infoNumero.getText().toString(),//2
-                        nombreCategoria+"",//3
-                        infoCiudad.getText().toString(),//4
-                        infoEmail.getText().toString(),//5
-                        infoWeb.getText().toString(),//6
-                        infoTelefono.getText().toString(),//7
-                        ""+yourLatitude,//8
-                        ""+yourLongitude,//9
-                        nota.getText().toString(),//10
-                        ""+valoracion.getRating(),//11
 
-                        String.valueOf(estacionamientoDisc.isChecked()),//12
-                        String.valueOf(rampaAcceso.isChecked()),//13
-                        estadoRampa.getSelectedItem().toString(),//14
-                        String.valueOf(bandaAntiAcces.isChecked()),//15
-                        String.valueOf(barraApoyoAcces.isChecked()),//16
-
-                        anchoPuerta.getSelectedItem().toString(),//17
-                        String.valueOf(banoDiscap.isChecked()),//18
-                        anchopuertaBano.getSelectedItem().toString(),//19
-                        String.valueOf(bandaAntiComod.isChecked()),//20
-                        String.valueOf(barrasApoyoComod.isChecked()),//21
-                        espacio.getSelectedItem().toString(),//22
-                        String.valueOf(lavamanos.isChecked())//23
-                );
-
-                Toast.makeText(getApplicationContext(),String.valueOf(estacionamientoDisc.isChecked()),Toast.LENGTH_LONG).show();
+                uploadEstablecimiento(nombreCategoria+"",""+yourLatitude,""+yourLongitude);
 
 
+            }
+        });
 
+        cargarImagenes.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
 
+                Intent intent = new Intent(Intent.ACTION_GET_CONTENT, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                intent.setType("image/*");
+                intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+                startActivityForResult(intent,1);
 
 
             }
         });
 
 
+        if (AccessToken.getCurrentAccessToken() != null) {
 
+            Profile profileDefault = Profile.getCurrentProfile();
+            imageViewPhoto = (ImageView) findViewById(R.id.imageViewPhoto);
+            Picasso.with(InfoLugar.this).load(profileDefault.getProfilePictureUri(100,100)).transform(new CircleTransform()).into(imageViewPhoto);
+
+
+        }
+
+
+    }
+
+
+
+    public void uploadEstablecimiento(final String categoria, final String latitud, final String longitud){
+        RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
+        StringRequest request = new StringRequest(Request.Method.POST, servicio + dirEstablecimiento,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+
+                        JSONObject jsonObject;
+                        try {
+                            jsonObject = new JSONObject(response.toString());
+                            String cod_establecimiento = jsonObject.getString("cod_establecimiento");
+
+                            uploadAccesibilidad(cod_establecimiento);
+                            uploadComodidad(cod_establecimiento);
+                            uploadImages(cod_establecimiento);
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                        Toast.makeText(getApplication(),response.toString(),Toast.LENGTH_SHORT).show();
+
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+                Toast.makeText(getApplication(),error.toString(),Toast.LENGTH_SHORT).show();
+
+
+            }
+        }){
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                HashMap<String,String> map = new HashMap<String, String>();
+
+                map.put("nombre",infoNombre.getText().toString());
+                map.put("calle",infoCalle.getText().toString());
+                map.put("numero",infoNumero.getText().toString());
+                map.put("cod_categoria",categoria);
+                map.put("hora_in","");
+                map.put("hora_ter","");
+                map.put("telefono",infoTelefono.getText().toString());
+                map.put("sitio_web",infoWeb.getText().toString());
+                map.put("latitud",latitud);
+                map.put("longitud",longitud);
+
+
+
+                return map;
+            }
+        };
+
+        requestQueue.add(request);
+    }
+
+
+    public void uploadAccesibilidad(final String codEstablecimiento){
+        RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
+        StringRequest request = new StringRequest(Request.Method.POST, servicio + dirAccesibilidad,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+
+                        Toast.makeText(getApplication(),response.toString(),Toast.LENGTH_SHORT).show();
+
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+                Toast.makeText(getApplication(),error.toString(),Toast.LENGTH_SHORT).show();
+
+
+            }
+        }){
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                HashMap<String,String> map = new HashMap<String, String>();
+
+                map.put("cod_establecimiento",codEstablecimiento);
+                map.put("estacionamiento",String.valueOf(estacionamientoDisc.isChecked()));
+                map.put("rampa",String.valueOf(rampaAcceso.isChecked()));
+                map.put("banda",String.valueOf(bandaAntiAcces.isChecked()));
+                map.put("barra",String.valueOf(barraApoyoAcces.isChecked()));
+                map.put("nota",nota.getText().toString());
+                map.put("valoracion",valoracion.getRating()+"");
+
+                return map;
+            }
+        };
+
+        requestQueue.add(request);
+
+
+    }
+
+    public void uploadComodidad(final String codEstablecimiento){
+
+        RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
+        StringRequest request = new StringRequest(Request.Method.POST, servicio + dirComodidad,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+
+                        Toast.makeText(getApplication(),response.toString(),Toast.LENGTH_SHORT).show();
+
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+                Toast.makeText(getApplication(),error.toString(),Toast.LENGTH_SHORT).show();
+
+
+            }
+        }){
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                HashMap<String,String> map = new HashMap<String, String>();
+
+                map.put("cod_establecimiento",codEstablecimiento);
+                map.put("ancho_puerta",anchoPuerta.getSelectedItem().toString());
+                map.put("bano",String.valueOf(banoDiscap.isChecked()));
+                map.put("banda",String.valueOf(bandaAntiComod.isChecked()));
+                map.put("barra",String.valueOf(barrasApoyoComod.isChecked()));
+                map.put("espacio",espacio.getSelectedItem().toString());
+                map.put("lavamano",String.valueOf(lavamanos.isChecked()));
+
+                return map;
+            }
+        };
+
+        requestQueue.add(request);
+
+    }
+
+    public void uploadImages(final String codEstablecimiento){
+        RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
+        StringRequest request = new StringRequest(Request.Method.POST, servicio + dirImg,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+
+                        Toast.makeText(getApplication(),response.toString(),Toast.LENGTH_SHORT).show();
+
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+                Toast.makeText(getApplication(),error.toString(),Toast.LENGTH_SHORT).show();
+
+
+            }
+        }){
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                HashMap<String,String> map = new HashMap<String, String>();
+                JSONObject item;
+                JSONArray array = new JSONArray();
+                JSONObject json = new JSONObject();
+
+                try {
+                    for (int i=0;i<imgsBit.size();i++){
+                        item = new JSONObject();
+                        item.put("img",imgsBit.get(i));
+                        array.put(item);
+                    }
+                    //json.put("imagenes",array);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                map.put("cod_establecimiento",codEstablecimiento);
+                map.put("img",array.toString());
+
+                return map;
+            }
+        };
+
+        requestQueue.add(request);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        imgsBit = new ArrayList<String>();
+
+
+
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},0);
+
+
+        // When an Image is picked
+        if (requestCode == 1 && resultCode == RESULT_OK
+                && null != data) {
+
+            if(data.getData()!= null){
+
+                agregarImagen(data.getData());
+
+
+            }else{
+                if(data.getClipData()!=null){
+                    ClipData mClipData=data.getClipData();
+                    for(int i=0;i<mClipData.getItemCount();i++){
+
+                        ClipData.Item item = mClipData.getItemAt(i);
+
+                        agregarImagen(item.getUri());
+                    }
+
+                }
+
+            }
+
+        } else {
+            Toast.makeText(this, "Problemas al cargar imagen",
+                    Toast.LENGTH_LONG).show();
+        }
+
+    }
+
+    private void agregarImagen(Uri uri){
+
+        Bitmap bitmap;
+
+        String[] filePathColumn = { MediaStore.Images.Media.DATA };
+
+        // Get the cursor
+        Cursor cursor = getContentResolver().query(uri,
+                filePathColumn, null, null, null);
+        // Move to first row
+        cursor.moveToFirst();
+
+        int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+        String ruta = cursor.getString(columnIndex);
+        cursor.close();
+
+        bitmap = BitmapFactory.decodeFile(ruta);
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG,100,stream);
+
+        byte[] array = stream.toByteArray();
+        imgsBit.add(Base64.encodeToString(array,0));
 
 
     }
@@ -270,121 +542,7 @@ public class InfoLugar extends AppCompatActivity {
 
 
 
-    private class TareaWSInsertar extends AsyncTask<String,Integer,Boolean> {
 
-        String respuesta;
-
-        protected Boolean doInBackground(String... params) {
-
-            boolean resul = true;
-
-            HttpClient httpClient = new DefaultHttpClient();
-
-            HttpPost post = new HttpPost("http://192.168.1.2/InclusivApp/controllers/establecimiento.php");
-                //post.setHeader("content-type", "application/json");
-
-                List<NameValuePair> datos = new ArrayList<>();
-
-                try
-                {
-                    //Construimos el objeto cliente en formato JSON
-
-                    datos.add(new BasicNameValuePair("nombre", params[0]));
-                    datos.add(new BasicNameValuePair("calle",params[1]));
-                    datos.add(new BasicNameValuePair("numero",params[2]));
-                    datos.add(new BasicNameValuePair("cod_categoria",params[3]));
-                    datos.add(new BasicNameValuePair("hora_in","0"));
-                    datos.add(new BasicNameValuePair("hora_ter","0"));
-                    datos.add(new BasicNameValuePair("telefono",params[7]));
-                    datos.add(new BasicNameValuePair("sitio_web",params[6]));
-                    datos.add(new BasicNameValuePair("latitud",params[8]));
-                    datos.add(new BasicNameValuePair("longitud",params[9]));
-                    datos.add(new BasicNameValuePair("nota",params[10]));
-                    datos.add(new BasicNameValuePair("valoracion",params[11]));
-
-
-
-                    post.setEntity(new UrlEncodedFormEntity(datos));
-
-
-
-                    HttpResponse resp = httpClient.execute(post);
-
-                respuesta = EntityUtils.toString(resp.getEntity());
-
-                JSONObject jsonObject = new JSONObject(respuesta);
-
-                int cod_establecimiento = jsonObject.getInt("cod_establecimiento");
-
-
-
-                //
-                post = new HttpPost("http://192.168.1.2/InclusivApp/controllers/accesibilidad.php");
-
-                    datos = new ArrayList<>();
-
-                    datos.add(new BasicNameValuePair("cod_establecimiento", cod_establecimiento+""));
-                    datos.add(new BasicNameValuePair("estacionamiento", params[12]));
-                    datos.add(new BasicNameValuePair("rampa", params[13]));
-                    datos.add(new BasicNameValuePair("banda", params[15]));
-                    datos.add(new BasicNameValuePair("barra", params[16]));
-
-                    post.setEntity(new UrlEncodedFormEntity(datos));
-
-                     resp = httpClient.execute(post);
-
-
-                     respuesta = EntityUtils.toString(resp.getEntity());
-
-
-
-
-                    //
-                    post = new HttpPost("http://192.168.1.2/InclusivApp/controllers/comodidad.php");
-
-                    datos = new ArrayList<>();
-
-                    datos.add(new BasicNameValuePair("cod_establecimiento", cod_establecimiento+""));
-                    datos.add(new BasicNameValuePair("ancho_puerta", params[17]));
-                    datos.add(new BasicNameValuePair("bano", params[18]));
-                    datos.add(new BasicNameValuePair("banda", params[20]));
-                    //datos.add(new BasicNameValuePair("rampa", params[19]));
-                    datos.add(new BasicNameValuePair("barra", params[21]));
-                    datos.add(new BasicNameValuePair("espacio", params[22]));
-                    datos.add(new BasicNameValuePair("lavamano", params[23]));
-
-
-                    post.setEntity(new UrlEncodedFormEntity(datos));
-
-                    resp = httpClient.execute(post);
-
-
-                    respuesta = EntityUtils.toString(resp.getEntity());
-
-                resul = true;
-            }
-            catch(Exception ex)
-            {
-                Log.e("ServicioRest","Error!", ex);
-                resul = false;
-                respuesta = ex.getMessage().toString();
-            }
-
-            return resul;
-        }
-
-        protected void onPostExecute(Boolean result) {
-
-            if(result){
-                Toast.makeText(getApplicationContext(),respuesta,Toast.LENGTH_LONG).show();
-
-            }else{
-                Toast.makeText(getApplicationContext(),respuesta,Toast.LENGTH_LONG).show();
-            }
-
-
-        }
-    }
 
 }
 

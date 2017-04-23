@@ -6,59 +6,13 @@
     tools:context=".descLugar"
     tools:ignore="MergeRootFrame">
 
-    <android.support.design.widget.AppBarLayout
-        android:id="@+id/app_bar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:fitsSystemWindows="true"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
-
-
-
-
-        <android.support.design.widget.CollapsingToolbarLayout
-            android:id="@+id/toolbar_layout"
-            android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:fitsSystemWindows="true"
-            app:contentScrim="?attr/colorPrimaryDark"
-            app:expandedTitleTextAppearance="@style/CollapsingToolbarLayoutExpandedTextStyle"
-            app:layout_scrollFlags="scroll|exitUntilCollapsed"
-            app:toolbarId="@+id/toolbar"
-            android:background="#0D47A1">
-
-            <ImageButton
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:id="@+id/imagenToolbar"
-                android:src="@drawable/ic_add_a_photo_white_48dp"
-                android:background="@android:color/transparent"
-
-                />
-
-            <android.support.v7.widget.Toolbar
-                android:id="@+id/detail_toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="200dp"
-                app:layout_collapseMode="pin"
-                app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-                >
-
-
-            </android.support.v7.widget.Toolbar>
-
-
-        </android.support.design.widget.CollapsingToolbarLayout>
-
-    </android.support.design.widget.AppBarLayout>
-
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/Truta"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical|start"
         android:layout_margin="16dp"
-        android:src="@drawable/ic_directions_walk_black_24dp"
+        android:src="@drawable/ic_flight_takeoff_black_24dp"
         app:layout_anchor="@+id/website_detail_container"
         app:layout_anchorGravity="top|end"
         app:backgroundTint="@android:color/white"
@@ -84,22 +38,21 @@
             android:layout_height="wrap_content"
             android:id="@+id/nombreLugar"
             android:text="Nombre"
-            android:textSize="24dp"
-            android:padding="15dp"
+            android:textSize="40dp"
+            android:padding="5dp"
             android:textColor="@android:color/white"
             />
-
 
 
         <RatingBar android:id="@+id/valoracionPromedio"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:numStars="5"
-            android:rating="0"
             android:stepSize="0.5"
-            android:layout_gravity="left"
+            android:layout_gravity="center"
             android:theme="@style/RatingBar"
             android:layout_marginLeft="10dp"
+            android:clickable="false"
 
             />
 
@@ -107,7 +60,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:background="@android:color/white">
+            android:background="@android:color/white"
+            >
+
+
 
 
 
@@ -117,7 +73,7 @@
                 android:text="CALIFICACIÓN DE INFRAESTRUCTURA"
                 android:textAlignment="center"
                 android:paddingTop="30dp"
-                android:textSize="15dp"/>
+                android:textSize="20dp"/>
 
 
             <LinearLayout
@@ -152,7 +108,7 @@
                                 android:layout_gravity="center"
                                 android:theme="@style/progresBar"
                                 style="?android:attr/progressBarStyleHorizontal"
-                                android:max="5"
+                                android:max="10"
                                 android:progress="4"
                                 android:progressDrawable="@drawable/progress_circle"
                                 android:rotation="-90"
@@ -188,7 +144,10 @@
                                         android:layout_height="match_parent"
                                         android:src="@drawable/ic_star_rate_black_18dp"
 
-                                        />
+                                        android:layout_alignParentTop="true"
+                                        android:layout_alignParentLeft="true"
+                                        android:layout_alignParentStart="true"
+                                        android:id="@+id/imageView2" />
                                 </RelativeLayout>
 
 
@@ -203,7 +162,9 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:text="Accesibilidad"
-                        android:textAlignment="center"/>
+                        android:textAlignment="center"
+                        android:textSize="40px"
+                        android:textColor="@color/colorPrimary"/>
 
                 </LinearLayout>
 
@@ -267,7 +228,8 @@
                                         android:layout_height="match_parent"
                                         android:src="@drawable/ic_star_rate_black_18dp"
 
-                                        />
+                                        android:layout_alignParentLeft="true"
+                                        android:layout_alignParentStart="true" />
                                 </RelativeLayout>
 
 
@@ -283,11 +245,50 @@
                         android:layout_height="match_parent"
                         android:text="Comodidad"
                         android:textAlignment="center"
-                        android:id="@+id/textView2" />
+                        android:textSize="40px"
+                        android:id="@+id/textView2"
+                        android:textColor="@color/colorPrimary"/>
 
                 </LinearLayout>
 
             </LinearLayout>
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/colorPrimary"
+                android:text="VALORAR"
+                android:textColor="@android:color/white"
+                android:textSize="22dp"
+                android:layout_marginTop="20dp"
+                android:id="@+id/botonValorar"
+                />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="Direccion"
+                android:layout_marginLeft="15px"
+                android:textSize="40px"
+                android:id="@+id/direccionDesc"
+                />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="Horario"
+                android:layout_marginLeft="15px"
+                android:textSize="40px"
+                android:id="@+id/horariDesc"
+                />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="Telefono"
+                android:layout_marginLeft="15px"
+                android:textSize="40px"
+                android:id="@+id/telefonoDesc"
+                />
+
 
 
 
@@ -304,5 +305,52 @@
 
 
     </android.support.v4.widget.NestedScrollView>
+
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/app_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fitsSystemWindows="true"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+
+
+
+
+        <android.support.design.widget.CollapsingToolbarLayout
+            android:id="@+id/toolbar_layout"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:fitsSystemWindows="true"
+            app:contentScrim="?attr/colorPrimaryDark"
+            app:expandedTitleTextAppearance="@style/CollapsingToolbarLayoutExpandedTextStyle"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed"
+            app:toolbarId="@+id/toolbar"
+            android:background="#0D47A1">
+
+
+
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/detail_toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                app:layout_collapseMode="pin"
+                app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+                >
+
+
+            </android.support.v7.widget.Toolbar>
+
+            <android.support.v4.view.ViewPager
+                android:id="@+id/viewPager"
+                android:background="@android:color/transparent"
+                android:src="@drawable/ic_add_a_photo_white_48dp"
+                android:layout_height="match_parent"
+                android:layout_width="match_parent">
+            </android.support.v4.view.ViewPager>
+
+
+        </android.support.design.widget.CollapsingToolbarLayout>
+
+    </android.support.design.widget.AppBarLayout>
 
 </android.support.design.widget.CoordinatorLayout>

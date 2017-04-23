@@ -21,6 +21,11 @@
         android:background="@android:color/white"
         />
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/text_view_full_name"/>
+
     <com.facebook.login.widget.LoginButton
         android:id="@+id/loginFace"
         android:layout_width="wrap_content"
