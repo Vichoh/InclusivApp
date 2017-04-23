@@ -88,8 +88,8 @@ public class Mapa extends Fragment implements OnMapReadyCallback, GoogleApiClien
     private GoogleApiClient apiClient;
 
 
-    private String dirEstablecimiento="http://cffca80a.ngrok.io/InclusivApp/controllers/establecimiento.php";
-    private String dirBusqueda = "http://cffca80a.ngrok.io/InclusivApp/controllers/busqueda.php";
+    private String dirEstablecimiento="http://84c513c9.ngrok.io/InclusivApp/controllers/establecimiento.php";
+    private String dirBusqueda = "http://84c513c9.ngrok.io/InclusivApp/controllers/busqueda.php";
 
     private ArrayList<Establecimiento> establecimientosBusqueda = new ArrayList<>();
     ArrayList<Establecimiento> establecimientosBusquedaVacio = new ArrayList<>();
@@ -122,7 +122,7 @@ public class Mapa extends Fragment implements OnMapReadyCallback, GoogleApiClien
                 .addConnectionCallbacks(this)
                 .addApi(LocationServices.API)
                 .build();
-
+        toggleLocationUpdates(true);
 
 
 
@@ -177,6 +177,11 @@ public class Mapa extends Fragment implements OnMapReadyCallback, GoogleApiClien
         TextView emptyTextView = (TextView) view.findViewById(R.id.vacio);
         listView.setEmptyView(emptyTextView);
 
+        //
+
+
+
+
 
         return view;
 
@@ -202,7 +207,7 @@ public class Mapa extends Fragment implements OnMapReadyCallback, GoogleApiClien
 
     @Override
     public void onMapReady(GoogleMap map) {
-
+        mapa = map;
         toggleLocationUpdates(true);
         LatLng referencia = new LatLng(latitudReferencia,longitudReferencia);
         //map.addMarker(new MarkerOptions().position(referencia).title("Tu estas aqui"));
@@ -220,16 +225,28 @@ public class Mapa extends Fragment implements OnMapReadyCallback, GoogleApiClien
 
 
 
-        mapa = map;
+
+         LatLng MELBOURNE = new LatLng(Double.parseDouble(markerLatitud),Double.parseDouble( markerLongitud));
+        Marker melbourne = mapa.addMarker(new MarkerOptions()
+                .position(MELBOURNE)
+                .title("Alerta")
+                .snippet("Population: 4,137,400"));
+        melbourne.showInfoWindow();
+
+         referencia = new LatLng(latitudReferencia,longitudReferencia);
+        mapa.addMarker(new MarkerOptions().position(referencia).title("Tu estas aquí")
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)).flat(true));
 
         mapa.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
             @Override
             public void onMapLongClick(LatLng latLng) {
 
+
                 Intent intent = new Intent (getContext(), Categoria.class);
 
                 intent.putExtra("latitud", ""+latLng.latitude);
                 intent.putExtra("longitud", ""+latLng.longitude);
+
                 startActivity(intent);
 
 
@@ -266,6 +283,7 @@ public class Mapa extends Fragment implements OnMapReadyCallback, GoogleApiClien
                 intent.putExtra("myLat", ""+latitudReferencia);
                 intent.putExtra("myLon", ""+longitudReferencia);
                 intent.putExtra("codCategoria", establecimiento.getCategoria());
+                intent.putExtra("cod_establecimiento", ""+establecimiento.getId());
 
                 startActivity( intent );
 

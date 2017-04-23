@@ -1,8 +1,7 @@
 package com.example.adrian.avance;
 
-import android.os.AsyncTask;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -11,23 +10,26 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import org.json.JSONObject;
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+import com.facebook.AccessToken;
+import com.facebook.Profile;
+import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
-import cz.msebera.android.httpclient.HttpResponse;
-import cz.msebera.android.httpclient.NameValuePair;
-import cz.msebera.android.httpclient.client.HttpClient;
-import cz.msebera.android.httpclient.client.entity.UrlEncodedFormEntity;
-import cz.msebera.android.httpclient.client.methods.HttpPost;
-import cz.msebera.android.httpclient.impl.client.DefaultHttpClient;
-import cz.msebera.android.httpclient.message.BasicNameValuePair;
-import cz.msebera.android.httpclient.util.EntityUtils;
+import back.CircleTransform;
 
 public class Valorar extends AppCompatActivity {
 
@@ -49,17 +51,26 @@ public class Valorar extends AppCompatActivity {
     private EditText nota;
     private RatingBar valoracion;
     private String codCategoria;
+    private String cod_Establecimiento;
+    private ImageView imageViewPhotoValorar;
+
+    private String servicio = "http://84c513c9.ngrok.io/InclusivApp/";
+    private String dirEstablecimiento = "controllers/establecimiento.php";
+    private String dirAccesibilidad = "controllers/accesibilidad.php";
+    private String dirComodidad = "controllers/comodidad.php";
+    private String dirImg = "controllers/img.php";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_valorar);
 
         setToolbar();
 
 
         codCategoria = getIntent().getStringExtra("codCategoria");
-
+        cod_Establecimiento = getIntent().getStringExtra("codCategoria");
 
         final String[] datos =
                 new String[]{"Bueno","Malo"};
@@ -118,44 +129,32 @@ public class Valorar extends AppCompatActivity {
         espacio.setAdapter(adaptador3);
 
         nota = (EditText) findViewById(R.id.notas);
-        valoracion = (RatingBar) findViewById(R.id.valoracion) ;
+       // valoracion = (RatingBar) findViewById(R.id.valoracion) ;
         enviarInfo = (Button) findViewById(R.id.botonEnviarInfo);
 
 
         enviarInfo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Valorar.TareaWSInsertar tarea = new Valorar.TareaWSInsertar();
-                tarea.execute(
 
-                        codCategoria,
-                        nota.getText().toString(),//10
-                        ""+valoracion.getRating(),//11
-
-                        String.valueOf(estacionamientoDisc.isChecked()),//12
-                        String.valueOf(rampaAcceso.isChecked()),//13
-                        estadoRampa.getSelectedItem().toString(),//14
-                        String.valueOf(bandaAntiAcces.isChecked()),//15
-                        String.valueOf(barraApoyoAcces.isChecked()),//16
-
-                        anchoPuerta.getSelectedItem().toString(),//17
-                        String.valueOf(banoDiscap.isChecked()),//18
-                        anchopuertaBano.getSelectedItem().toString(),//19
-                        String.valueOf(bandaAntiComod.isChecked()),//20
-                        String.valueOf(barrasApoyoComod.isChecked()),//21
-                        espacio.getSelectedItem().toString(),//22
-                        String.valueOf(lavamanos.isChecked())//23
-                );
-
-                Toast.makeText(getApplicationContext(),String.valueOf(estacionamientoDisc.isChecked()),Toast.LENGTH_LONG).show();
-
-
+                uploadAccesibilidad (cod_Establecimiento);
+                uploadComodidad(cod_Establecimiento);
 
 
 
 
             }
         });
+
+
+        if (AccessToken.getCurrentAccessToken() != null) {
+
+            Profile profileDefault = Profile.getCurrentProfile();
+            imageViewPhotoValorar = (ImageView) findViewById(R.id.imageViewPhotoValorar);
+            Picasso.with(Valorar.this).load(profileDefault.getProfilePictureUri(100,100)).transform(new CircleTransform()).into(imageViewPhotoValorar);
+
+
+        }
     }
 
     private void setToolbar() {
@@ -177,119 +176,83 @@ public class Valorar extends AppCompatActivity {
     }
 
 
-    private class TareaWSInsertar extends AsyncTask<String,Integer,Boolean> {
+    public void uploadAccesibilidad(final String codEstablecimiento){
+        RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
+        StringRequest request = new StringRequest(Request.Method.POST, servicio + dirAccesibilidad,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
 
-        String respuesta;
+                        Toast.makeText(getApplication(),response.toString(),Toast.LENGTH_SHORT).show();
 
-        protected Boolean doInBackground(String... params) {
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
 
-            boolean resul = true;
-
-            HttpClient httpClient = new DefaultHttpClient();
-
-            HttpPost post = new HttpPost("http://192.168.1.2/InclusivApp/controllers/establecimiento.php");
-            //post.setHeader("content-type", "application/json");
-
-            List<NameValuePair> datos = new ArrayList<>();
-
-            try
-            {
-                //Construimos el objeto cliente en formato JSON
-
-                datos.add(new BasicNameValuePair("nombre", params[0]));
-                datos.add(new BasicNameValuePair("calle",params[1]));
-                datos.add(new BasicNameValuePair("numero",params[2]));
-                datos.add(new BasicNameValuePair("cod_categoria",params[3]));
-                datos.add(new BasicNameValuePair("hora_in","0"));
-                datos.add(new BasicNameValuePair("hora_ter","0"));
-                datos.add(new BasicNameValuePair("telefono",params[7]));
-                datos.add(new BasicNameValuePair("sitio_web",params[6]));
-                datos.add(new BasicNameValuePair("latitud",params[8]));
-                datos.add(new BasicNameValuePair("longitud",params[9]));
-                datos.add(new BasicNameValuePair("nota",params[10]));
-                datos.add(new BasicNameValuePair("valoracion",params[11]));
+                Toast.makeText(getApplication(),error.toString(),Toast.LENGTH_SHORT).show();
 
 
-
-                post.setEntity(new UrlEncodedFormEntity(datos));
-
-
-
-                HttpResponse resp = httpClient.execute(post);
-
-                respuesta = EntityUtils.toString(resp.getEntity());
-
-                JSONObject jsonObject = new JSONObject(respuesta);
-
-                int cod_establecimiento = jsonObject.getInt("cod_establecimiento");
-
-
-
-                //
-                post = new HttpPost("http://192.168.1.2/InclusivApp/controllers/accesibilidad.php");
-
-                datos = new ArrayList<>();
-
-                datos.add(new BasicNameValuePair("cod_establecimiento", cod_establecimiento+""));
-                datos.add(new BasicNameValuePair("estacionamiento", params[12]));
-                datos.add(new BasicNameValuePair("rampa", params[13]));
-                datos.add(new BasicNameValuePair("banda", params[15]));
-                datos.add(new BasicNameValuePair("barra", params[16]));
-
-                post.setEntity(new UrlEncodedFormEntity(datos));
-
-                resp = httpClient.execute(post);
-
-
-                respuesta = EntityUtils.toString(resp.getEntity());
-
-
-
-
-                //
-                post = new HttpPost("http://192.168.1.2/InclusivApp/controllers/comodidad.php");
-
-                datos = new ArrayList<>();
-
-                datos.add(new BasicNameValuePair("cod_establecimiento", cod_establecimiento+""));
-                datos.add(new BasicNameValuePair("ancho_puerta", params[17]));
-                datos.add(new BasicNameValuePair("bano", params[18]));
-                datos.add(new BasicNameValuePair("banda", params[20]));
-                //datos.add(new BasicNameValuePair("rampa", params[19]));
-                datos.add(new BasicNameValuePair("barra", params[21]));
-                datos.add(new BasicNameValuePair("espacio", params[22]));
-                datos.add(new BasicNameValuePair("lavamano", params[23]));
-
-
-                post.setEntity(new UrlEncodedFormEntity(datos));
-
-                resp = httpClient.execute(post);
-
-
-                respuesta = EntityUtils.toString(resp.getEntity());
-
-                resul = true;
             }
-            catch(Exception ex)
-            {
-                Log.e("ServicioRest","Error!", ex);
-                resul = false;
-                respuesta = ex.getMessage().toString();
+        }){
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                HashMap<String,String> map = new HashMap<String, String>();
+
+                map.put("cod_establecimiento",codEstablecimiento);
+                map.put("estacionamiento",String.valueOf(estacionamientoDisc.isChecked()));
+                map.put("rampa",String.valueOf(rampaAcceso.isChecked()));
+                map.put("banda",String.valueOf(bandaAntiAcces.isChecked()));
+                map.put("barra",String.valueOf(barraApoyoAcces.isChecked()));
+                map.put("nota",nota.getText().toString());
+                map.put("valoracion","1");
+
+                return map;
             }
+        };
 
-            return resul;
-        }
+        requestQueue.add(request);
 
-        protected void onPostExecute(Boolean result) {
 
-            if(result){
-                Toast.makeText(getApplicationContext(),respuesta,Toast.LENGTH_LONG).show();
+    }
 
-            }else{
-                Toast.makeText(getApplicationContext(),respuesta,Toast.LENGTH_LONG).show();
+    public void uploadComodidad(final String codEstablecimiento){
+
+        RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
+        StringRequest request = new StringRequest(Request.Method.POST, servicio + dirComodidad,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+
+                        Toast.makeText(getApplication(),response.toString(),Toast.LENGTH_SHORT).show();
+
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+                Toast.makeText(getApplication(),error.toString(),Toast.LENGTH_SHORT).show();
+
+
             }
+        }){
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                HashMap<String,String> map = new HashMap<String, String>();
 
+                map.put("cod_establecimiento",codEstablecimiento);
+                map.put("ancho_puerta",anchoPuerta.getSelectedItem().toString());
+                map.put("bano",String.valueOf(banoDiscap.isChecked()));
+                map.put("banda",String.valueOf(bandaAntiComod.isChecked()));
+                map.put("barra",String.valueOf(barrasApoyoComod.isChecked()));
+                map.put("espacio",espacio.getSelectedItem().toString());
+                map.put("lavamano",String.valueOf(lavamanos.isChecked()));
 
-        }
+                return map;
+            }
+        };
+
+        requestQueue.add(request);
+
     }
 }

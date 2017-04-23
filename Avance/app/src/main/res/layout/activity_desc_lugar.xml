@@ -6,18 +6,48 @@
     tools:context=".descLugar"
     tools:ignore="MergeRootFrame">
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/Truta"
-        android:layout_width="wrap_content"
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/app_bar"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical|start"
-        android:layout_margin="16dp"
-        android:src="@drawable/ic_flight_takeoff_black_24dp"
-        app:layout_anchor="@+id/website_detail_container"
-        app:layout_anchorGravity="top|end"
-        app:backgroundTint="@android:color/white"
+        android:fitsSystemWindows="true"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
-        />
+
+
+
+
+        <android.support.design.widget.CollapsingToolbarLayout
+            android:id="@+id/toolbar_layout"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:fitsSystemWindows="true"
+            app:contentScrim="?attr/colorPrimaryDark"
+            app:expandedTitleTextAppearance="@style/CollapsingToolbarLayoutExpandedTextStyle"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed"
+
+            android:background="#0D47A1">
+
+            <android.support.v4.view.ViewPager
+                android:id="@+id/viewPager"
+                android:background="@android:color/transparent"
+                android:src="@drawable/ic_add_a_photo_white_48dp"
+                android:layout_height="match_parent"
+                android:layout_width="match_parent"
+                app:layout_collapseMode="parallax"/>
+
+
+            <android.support.v7.widget.Toolbar
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:id="@+id/detail_toolbar"/>
+
+
+        </android.support.design.widget.CollapsingToolbarLayout>
+
+    </android.support.design.widget.AppBarLayout>
+
+
 
     <android.support.v4.widget.NestedScrollView
         android:id="@+id/website_detail_container"
@@ -28,18 +58,21 @@
 
 
     <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:orientation="vertical"
-        android:background="@color/colorPrimary">
+        android:background="@color/colorPrimary"
+        android:weightSum="1">
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/nombreLugar"
             android:text="Nombre"
-            android:textSize="40dp"
-            android:padding="5dp"
+            android:textSize="22dp"
+            android:padding="10dp"
             android:textColor="@android:color/white"
             />
 
@@ -49,10 +82,10 @@
             android:layout_height="wrap_content"
             android:numStars="5"
             android:stepSize="0.5"
-            android:layout_gravity="center"
+            android:layout_gravity="left"
             android:theme="@style/RatingBar"
             android:layout_marginLeft="10dp"
-            android:clickable="false"
+            android:clickable="true"
 
             />
 
@@ -73,7 +106,7 @@
                 android:text="CALIFICACIÓN DE INFRAESTRUCTURA"
                 android:textAlignment="center"
                 android:paddingTop="30dp"
-                android:textSize="20dp"/>
+                android:textSize="16dp"/>
 
 
             <LinearLayout
@@ -163,7 +196,7 @@
                         android:layout_height="match_parent"
                         android:text="Accesibilidad"
                         android:textAlignment="center"
-                        android:textSize="40px"
+                        android:textSize="14dp"
                         android:textColor="@color/colorPrimary"/>
 
                 </LinearLayout>
@@ -245,7 +278,7 @@
                         android:layout_height="match_parent"
                         android:text="Comodidad"
                         android:textAlignment="center"
-                        android:textSize="40px"
+                        android:textSize="14dp"
                         android:id="@+id/textView2"
                         android:textColor="@color/colorPrimary"/>
 
@@ -254,7 +287,7 @@
             </LinearLayout>
 
             <Button
-                android:layout_width="match_parent"
+                android:layout_width="fill_parent"
                 android:layout_height="match_parent"
                 android:background="@color/colorPrimary"
                 android:text="VALORAR"
@@ -262,33 +295,67 @@
                 android:textSize="22dp"
                 android:layout_marginTop="20dp"
                 android:id="@+id/botonValorar"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
                 />
 
-            <TextView
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:text="Direccion"
-                android:layout_marginLeft="15px"
-                android:textSize="40px"
-                android:id="@+id/direccionDesc"
-                />
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:text="Horario"
-                android:layout_marginLeft="15px"
-                android:textSize="40px"
-                android:id="@+id/horariDesc"
-                />
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:text="Telefono"
-                android:layout_marginLeft="15px"
-                android:textSize="40px"
-                android:id="@+id/telefonoDesc"
-                />
+                android:orientation="horizontal"
+                android:layout_marginTop="60dp">
 
+
+                <TextView
+
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="Direccion"
+                    android:layout_marginLeft="150px"
+                    android:textSize="16dp"
+                    android:id="@+id/direccionDesc"
+                    android:textColor="@android:color/black"
+                    />
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="Telefono"
+                    android:layout_marginLeft="150px"
+                    android:textSize="16dp"
+                    android:id="@+id/telefonoDesc"
+                    android:textColor="@android:color/black"
+                    />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="Pagina web"
+                    android:layout_marginLeft="150px"
+                    android:textSize="16dp"
+                    android:id="@+id/correoDesc"
+                    android:textColor="@android:color/black"
+                    />
+
+
+
+            </LinearLayout>
 
 
 
@@ -299,58 +366,20 @@
 
 
 
-
-
-
-
-
     </android.support.v4.widget.NestedScrollView>
 
-    <android.support.design.widget.AppBarLayout
-        android:id="@+id/app_bar"
-        android:layout_width="match_parent"
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/Truta"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:fitsSystemWindows="true"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+        android:layout_gravity="center_vertical|start"
+        android:layout_margin="16dp"
+        android:src="@drawable/ic_flight_takeoff_black_24dp"
+        app:layout_anchor="@+id/website_detail_container"
+        app:layout_anchorGravity="top|end"
+        app:backgroundTint="@android:color/white"
 
+        />
 
-
-
-        <android.support.design.widget.CollapsingToolbarLayout
-            android:id="@+id/toolbar_layout"
-            android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:fitsSystemWindows="true"
-            app:contentScrim="?attr/colorPrimaryDark"
-            app:expandedTitleTextAppearance="@style/CollapsingToolbarLayoutExpandedTextStyle"
-            app:layout_scrollFlags="scroll|exitUntilCollapsed"
-            app:toolbarId="@+id/toolbar"
-            android:background="#0D47A1">
-
-
-
-            <android.support.v7.widget.Toolbar
-                android:id="@+id/detail_toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="200dp"
-                app:layout_collapseMode="pin"
-                app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-                >
-
-
-            </android.support.v7.widget.Toolbar>
-
-            <android.support.v4.view.ViewPager
-                android:id="@+id/viewPager"
-                android:background="@android:color/transparent"
-                android:src="@drawable/ic_add_a_photo_white_48dp"
-                android:layout_height="match_parent"
-                android:layout_width="match_parent">
-            </android.support.v4.view.ViewPager>
-
-
-        </android.support.design.widget.CollapsingToolbarLayout>
-
-    </android.support.design.widget.AppBarLayout>
 
 </android.support.design.widget.CoordinatorLayout>

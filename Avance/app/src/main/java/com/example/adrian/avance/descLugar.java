@@ -38,8 +38,6 @@ import back.Rutas;
 public class descLugar extends AppCompatActivity {
 
     private CollapsingToolbarLayout nombre_Intitucion_lista;
-
-
     private TextView nombreEstablecimiento;
     private RatingBar calificacionPromedio;
     private TextView valoracion_centro_accesibilidad;
@@ -55,13 +53,13 @@ public class descLugar extends AppCompatActivity {
     private String latLugar;
     private String lonLugar;
     private String codCategoria;
-
+    private String  cod_establecimiento;
 
 
     private ViewPager galeria;
     private GaleriaAdaptador galeriaAdaptador;
-    private String dirImg = "http://cffca80a.ngrok.io/InclusivApp/img/";
-    private String servicioImg = "http://cffca80a.ngrok.io/InclusivApp/controllers/img.php";
+    private String dirImg = "http://84c513c9.ngrok.io/InclusivApp/img/";
+    private String servicioImg = "http://84c513c9.ngrok.io/InclusivApp/controllers/img.php";
 
 
 
@@ -84,7 +82,7 @@ public class descLugar extends AppCompatActivity {
         valoracion_centro_accesibilidad = (TextView) findViewById(R.id.valoracion_centro_accesibilidad);
         valoracion_centro_comodidad = (TextView) findViewById(R.id.valoracion_centro_comodidad);
         direccionDesc = (TextView) findViewById(R.id.direccionDesc);
-        horariDesc = (TextView) findViewById(R.id.horariDesc);
+
         nombreEstablecimiento = (TextView) findViewById(R.id.nombreLugar);
         telefonoDesc = (TextView) findViewById(R.id.telefonoDesc);
         calificacionPromedio = (RatingBar) findViewById(R.id.valoracionPromedio);
@@ -96,15 +94,16 @@ public class descLugar extends AppCompatActivity {
         valoracion_centro_accesibilidad.setText(getIntent().getStringExtra("valoracion_centro_accesibilidad"));
         valoracion_centro_comodidad.setText(getIntent().getStringExtra("valoracion_centro_comodidad"));
         direccionDesc.setText(getIntent().getStringExtra("direccionDesc"));
-        horariDesc.setText(getIntent().getStringExtra("horariDesc"));
+
         telefonoDesc.setText(getIntent().getStringExtra("telefonoDesc"));
         //calificacionPromedio.setRating(Float.parseFloat(getIntent().getStringExtra("calificacionPromedio")));
        // progress_bar_accesibilidad.setProgress(Integer.parseInt(getIntent().getStringExtra("progress_bar_accesibilidad"))*2);
       //  progress_bar_comodidad.setProgress(Integer.parseInt(getIntent().getStringExtra("progress_bar_comodidad"))*2);
 
+        nombre_Intitucion_lista.setTitle("Establecimiento");
 
 
-
+        cod_establecimiento = getIntent().getStringExtra("cod_establecimiento");
         codCategoria = getIntent().getStringExtra("codCategoria");
         myLat = getIntent().getStringExtra("myLat");
         myLon = getIntent().getStringExtra("myLon");
@@ -140,6 +139,7 @@ public class descLugar extends AppCompatActivity {
             public void onClick(View view) {
                 Intent intent = new Intent (getApplicationContext(), Valorar.class);
                 intent.putExtra("codCategoria", codCategoria);
+                intent.putExtra("cod_Establecimiento", codCategoria);
                 startActivity(intent);
             }
         });
@@ -208,7 +208,7 @@ public class descLugar extends AppCompatActivity {
     private void setToolbar() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.detail_toolbar);
         toolbar.setTitle("");
-        setSupportActionBar(toolbar);
+         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
     @Override

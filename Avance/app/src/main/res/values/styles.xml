@@ -36,7 +36,7 @@
 
     <style name="RatingBar" parent="Theme.AppCompat">
         <item name="colorControlNormal">#757575</item>
-        <item name="colorControlActivated">#F9A825</item>
+        <item name="colorControlActivated">#FFEB3B</item>
     </style>
 
     <style name="FullWidthEditText" parent="Theme.AppCompat.Light">

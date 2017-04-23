@@ -84,7 +84,7 @@ public class InfoLugar extends AppCompatActivity {
     private SwitchCompat lavamanos ;
     private Button cargarImagenes;
 
-    private String servicio = "http://cffca80a.ngrok.io/InclusivApp/";
+    private String servicio = "http://84c513c9.ngrok.io/InclusivApp/";
     private String dirEstablecimiento = "controllers/establecimiento.php";
     private String dirAccesibilidad = "controllers/accesibilidad.php";
     private String dirComodidad = "controllers/comodidad.php";
@@ -202,7 +202,7 @@ public class InfoLugar extends AppCompatActivity {
         infoWeb = (EditText) findViewById(R.id.infoWeb);
         nota = (EditText) findViewById(R.id.notas);
         infoEmail = (EditText) findViewById(R.id.infoEmail);
-        valoracion = (RatingBar) findViewById(R.id.valoracion) ;
+        //valoracion = (RatingBar) findViewById(R.id.valoracion) ;
         infoNombre = (EditText) findViewById(R.id.infoNombre);
         enviarInfo = (Button) findViewById(R.id.botonEnviarInfo);
 
@@ -353,7 +353,7 @@ public class InfoLugar extends AppCompatActivity {
                 map.put("banda",String.valueOf(bandaAntiAcces.isChecked()));
                 map.put("barra",String.valueOf(barraApoyoAcces.isChecked()));
                 map.put("nota",nota.getText().toString());
-                map.put("valoracion",valoracion.getRating()+"");
+                map.put("valoracion","1");
 
                 return map;
             }

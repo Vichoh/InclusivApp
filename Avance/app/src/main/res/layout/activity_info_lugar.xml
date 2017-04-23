@@ -197,6 +197,16 @@
 
             </android.support.design.widget.TextInputLayout>
 
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Cargar Imagenes"
+                android:id="@+id/btnImg"
+                android:background="@color/colorPrimary"
+                android:textColor="@android:color/white"
+                android:layout_marginTop="30dp"/>
+
+
 
             <include
 
@@ -211,6 +221,7 @@
 
 
                 <ImageView
+                    android:layout_marginTop="30dp"
                     android:id="@+id/imageViewPhoto"
                     android:layout_width="100dp"
                     android:layout_height="100dp"
@@ -220,27 +231,6 @@
             </RelativeLayout>
 
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Valora segun tu experiencia"
-                android:textColor="@android:color/black"
-                android:textAlignment="center"
-                android:textSize="14dp"
-                android:paddingTop="25dp"/>
-
-
-
-
-            <RatingBar android:id="@+id/valoracion"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:numStars="5"
-                android:rating="0"
-                android:stepSize="0.5"
-                android:layout_gravity="center"
-                android:theme="@style/RatingBar"
-                />
 
 
             <TextView
@@ -267,13 +257,6 @@
             </android.support.design.widget.TextInputLayout>
 
 
-            <Button
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Cargar Imagenes"
-                android:id="@+id/btnImg"
-                android:background="@color/colorPrimary"
-                android:textColor="@android:color/white"/>
 
             <Button
                 android:layout_width="match_parent"
