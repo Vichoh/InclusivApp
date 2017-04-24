@@ -3,6 +3,7 @@ package com.example.adrian.avance;
 import android.Manifest;
 import android.content.ClipData;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -12,6 +13,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
@@ -171,7 +173,7 @@ public class InfoLugar extends AppCompatActivity {
             public void onClick(View view) {
 
 
-                 List<Address> yourAddresses = new ArrayList<>();
+                List<Address> yourAddresses = new ArrayList<>();
 
                 try {
                     yourAddresses= geocoder.getFromLocation(yourLatitude, yourLongitude, 1);
@@ -207,10 +209,10 @@ public class InfoLugar extends AppCompatActivity {
         enviarInfo = (Button) findViewById(R.id.botonEnviarInfo);
 
         estacionamientoDisc = (SwitchCompat) findViewById(R.id.SwichEstacionamiento);
-         rampaAcceso =(SwitchCompat) findViewById(R.id.SwichrampaAcceso);
-         estadoRampa =(Spinner) findViewById(R.id.estadoBarras);
+        rampaAcceso =(SwitchCompat) findViewById(R.id.SwichrampaAcceso);
+        estadoRampa =(Spinner) findViewById(R.id.estadoBarras);
         bandaAntiAcces =(SwitchCompat) findViewById(R.id.SwichBandaAnti);
-         barraApoyoAcces =(SwitchCompat) findViewById(R.id.SwichBarraApoyoAcces);
+        barraApoyoAcces =(SwitchCompat) findViewById(R.id.SwichBarraApoyoAcces);
 
         anchoPuerta =(Spinner) findViewById(R.id.opcionesAnchoPuertas);
         banoDiscap =(SwitchCompat) findViewById(R.id.SwichbanoDiscapacitados);
@@ -242,6 +244,13 @@ public class InfoLugar extends AppCompatActivity {
         cargarImagenes.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                if ( ContextCompat.checkSelfPermission(InfoLugar.this,android.Manifest.permission.READ_EXTERNAL_STORAGE ) != PackageManager.PERMISSION_GRANTED ) {
+
+                    ActivityCompat.requestPermissions(InfoLugar.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},0);
+                }
+
+
 
                 Intent intent = new Intent(Intent.ACTION_GET_CONTENT, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                 intent.setType("image/*");
@@ -460,7 +469,7 @@ public class InfoLugar extends AppCompatActivity {
 
 
 
-        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},0);
+
 
 
         // When an Image is picked
@@ -510,11 +519,12 @@ public class InfoLugar extends AppCompatActivity {
         cursor.close();
 
         bitmap = BitmapFactory.decodeFile(ruta);
+        Toast.makeText(getApplication(),"imagen de meirda"+ruta,Toast.LENGTH_SHORT).show();
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.JPEG,100,stream);
 
         byte[] array = stream.toByteArray();
-        imgsBit.add(Base64.encodeToString(array,0));
+        //imgsBit.add(Base64.encodeToString(array,0));
 
 
     }
@@ -545,6 +555,9 @@ public class InfoLugar extends AppCompatActivity {
 
 
 }
+
+
+
 
 
 

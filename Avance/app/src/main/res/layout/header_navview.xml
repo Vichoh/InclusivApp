@@ -10,7 +10,7 @@
 
     <de.hdodenhof.circleimageview.CircleImageView
         xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/profile_image"
+        android:id="@+id/profile_imageFacebook"
         android:layout_marginLeft="16dp"
         android:layout_marginTop="35dp"
         android:layout_width="96dp"
@@ -37,7 +37,7 @@
             android:text="Usuario"
             android:textColor="@android:color/white"
             android:textAppearance="@style/TextAppearance.AppCompat.Body2"
-            android:id="@+id/nom_usuario"/>
+            android:id="@+id/nom_usuarioFacebook"/>
 
         <TextView
             android:layout_width="match_parent"
@@ -47,7 +47,7 @@
             android:text="correo"
             android:textColor="@android:color/white"
             android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-            android:id="@+id/correo_usuario"/>
+            android:id="@+id/correo_usuarioFacebook"/>
 
     </LinearLayout>
 </FrameLayout>

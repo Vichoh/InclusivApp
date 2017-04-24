@@ -54,7 +54,7 @@ public class Valorar extends AppCompatActivity {
     private String cod_Establecimiento;
     private ImageView imageViewPhotoValorar;
 
-    private String servicio = "http://84c513c9.ngrok.io/InclusivApp/";
+    private String servicio = "http://a5343472.ngrok.io/InclusivApp/";
     private String dirEstablecimiento = "controllers/establecimiento.php";
     private String dirAccesibilidad = "controllers/accesibilidad.php";
     private String dirComodidad = "controllers/comodidad.php";

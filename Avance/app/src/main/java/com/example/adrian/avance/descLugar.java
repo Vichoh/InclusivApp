@@ -10,7 +10,9 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RatingBar;
 import android.widget.TextView;
@@ -54,13 +56,15 @@ public class descLugar extends AppCompatActivity {
     private String lonLugar;
     private String codCategoria;
     private String  cod_establecimiento;
-
+    private ListView list_comentarios;
 
     private ViewPager galeria;
+    private ArrayAdapter<String> namesAA;
     private GaleriaAdaptador galeriaAdaptador;
-    private String dirImg = "http://84c513c9.ngrok.io/InclusivApp/img/";
-    private String servicioImg = "http://84c513c9.ngrok.io/InclusivApp/controllers/img.php";
-
+    private String dirImg = "http://a5343472.ngrok.io/InclusivApp/img/";
+    private String servicioImg = "http://a5343472.ngrok.io/InclusivApp/controllers/img.php";
+    private String servicioComentarios = "http://a5343472.ngrok.io/InclusivApp/controllers/nota.php";
+    private static ArrayList<String> comentarios = new ArrayList<>();
 
 
     @Override
@@ -76,6 +80,9 @@ public class descLugar extends AppCompatActivity {
         String codEstablecimiento = getIntent().getStringExtra("cod_establecimiento");
         Toast.makeText(getApplicationContext(),codEstablecimiento,Toast.LENGTH_SHORT).show();
         cargarImagenes(codEstablecimiento);
+
+        //cargo lso comentarios
+
 
 
         nombre_Intitucion_lista = (CollapsingToolbarLayout) findViewById(R.id.toolbar_layout);
@@ -144,6 +151,16 @@ public class descLugar extends AppCompatActivity {
             }
         });
 
+
+        //comentarios
+        list_comentarios = (ListView) findViewById(R.id.list_comentarios) ;
+        cargarComentarios(codEstablecimiento);
+       // AdaptadorComentario adaptadorComentario = new AdaptadorComentario(this, comentarios);
+       // Toast.makeText(getApplicationContext(),"asdasdasgag"+comentarios.get(0),Toast.LENGTH_SHORT).show();
+       // comentarios.add("si tiene un dato ahora");
+       // ArrayAdapter<String> namesAA = new ArrayAdapter<String>( this, android.R.layout.simple_list_item_1, comentarios );
+
+        //list_comentarios.setAdapter(namesAA);
     }
 
 
@@ -180,6 +197,67 @@ public class descLugar extends AppCompatActivity {
                         }
 
                         Toast.makeText(getApplication(),response.toString(),Toast.LENGTH_SHORT).show();
+
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+                Toast.makeText(getApplication(),error.toString(),Toast.LENGTH_SHORT).show();
+
+
+            }
+        }){
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                HashMap<String,String> map = new HashMap<String, String>();
+
+                map.put("cod_establecimiento",codEstablecimiento);
+
+                return map;
+            }
+        };
+
+        requestQueue.add(request);
+
+    }
+
+    private void cargarComentarios(final String codEstablecimiento){
+
+        RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
+        StringRequest request = new StringRequest(Request.Method.GET, servicioComentarios+"?cod_establecimiento="+codEstablecimiento,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+
+                        Toast.makeText(getApplicationContext(),response.toString(),Toast.LENGTH_SHORT).show();
+
+
+
+
+                        try {
+                            JSONArray array = new JSONArray(response.toString());
+
+                            ArrayList<String> urls = new ArrayList<String>();
+
+                            for(int i=0;i<array.length();i++){
+
+                                urls.add(array.getJSONObject(i).getString("nota"));
+
+                            }
+
+                            comentarios = urls;
+                            urls.add("si tieen un comentarioo");
+                             namesAA = new ArrayAdapter<String>( getApplicationContext(), android.R.layout.simple_list_item_1, urls );
+                            Toast.makeText(getApplicationContext(),"aaaaaaaaaaa"+comentarios.get(0),Toast.LENGTH_SHORT).show();
+                            list_comentarios.setAdapter(namesAA);
+
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+
 
                     }
                 }, new Response.ErrorListener() {

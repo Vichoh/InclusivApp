@@ -88,8 +88,8 @@ public class Mapa extends Fragment implements OnMapReadyCallback, GoogleApiClien
     private GoogleApiClient apiClient;
 
 
-    private String dirEstablecimiento="http://84c513c9.ngrok.io/InclusivApp/controllers/establecimiento.php";
-    private String dirBusqueda = "http://84c513c9.ngrok.io/InclusivApp/controllers/busqueda.php";
+    private String dirEstablecimiento="http://a5343472.ngrok.io/InclusivApp/controllers/establecimiento.php";
+    private String dirBusqueda = "http://a5343472.ngrok.io/InclusivApp/controllers/busqueda.php";
 
     private ArrayList<Establecimiento> establecimientosBusqueda = new ArrayList<>();
     ArrayList<Establecimiento> establecimientosBusquedaVacio = new ArrayList<>();

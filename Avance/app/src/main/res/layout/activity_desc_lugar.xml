@@ -47,14 +47,12 @@
 
     </android.support.design.widget.AppBarLayout>
 
-
-
     <android.support.v4.widget.NestedScrollView
         android:id="@+id/website_detail_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        android:background="@android:color/white">
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" >
+
 
 
     <LinearLayout
@@ -88,6 +86,11 @@
             android:clickable="true"
 
             />
+
+
+
+
+
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -299,11 +302,18 @@
                 android:layout_marginRight="10dp"
                 />
 
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="1dp"
+                android:background="@android:color/black"
+                android:layout_marginTop="60dp"/>
+
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="horizontal"
-                android:layout_marginTop="60dp">
+                android:layout_marginTop="20dp">
 
 
                 <TextView
@@ -355,18 +365,43 @@
 
 
 
+
+
             </LinearLayout>
+
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="1dp"
+                android:background="@android:color/black"
+                android:layout_marginTop="100dp"
+                android:layout_marginBottom="100dp"
+                />
+
+
 
 
 
         </LinearLayout>
 
+        <ListView
+            android:id="@+id/list_comentarios"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@android:color/white"
+            android:scrollbars="vertical"
+            android:divider="@android:color/black"
+
+
+             />
+
     </LinearLayout>
 
-
-
-
     </android.support.v4.widget.NestedScrollView>
+
+
+
+
+
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/Truta"
