@@ -28,6 +28,7 @@ import com.android.volley.toolbox.Volley;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -64,6 +65,7 @@ public class descLugar extends AppCompatActivity {
     private String dirImg = "http://a5343472.ngrok.io/InclusivApp/img/";
     private String servicioImg = "http://a5343472.ngrok.io/InclusivApp/controllers/img.php";
     private String servicioComentarios = "http://a5343472.ngrok.io/InclusivApp/controllers/nota.php";
+    private String servicioValoracion = "http://a5343472.ngrok.io/InclusivApp/controllers/valoracion.php";
     private static ArrayList<String> comentarios = new ArrayList<>();
 
 
@@ -161,6 +163,10 @@ public class descLugar extends AppCompatActivity {
        // ArrayAdapter<String> namesAA = new ArrayAdapter<String>( this, android.R.layout.simple_list_item_1, comentarios );
 
         //list_comentarios.setAdapter(namesAA);
+
+
+
+        cargarValoracion(codEstablecimiento);
     }
 
 
@@ -252,6 +258,64 @@ public class descLugar extends AppCompatActivity {
                             Toast.makeText(getApplicationContext(),"aaaaaaaaaaa"+comentarios.get(0),Toast.LENGTH_SHORT).show();
                             list_comentarios.setAdapter(namesAA);
 
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+
+
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+                Toast.makeText(getApplication(),error.toString(),Toast.LENGTH_SHORT).show();
+
+
+            }
+        }){
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                HashMap<String,String> map = new HashMap<String, String>();
+
+                map.put("cod_establecimiento",codEstablecimiento);
+
+                return map;
+            }
+        };
+
+        requestQueue.add(request);
+
+    }
+
+
+
+    private void cargarValoracion(final String codEstablecimiento){
+
+        RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
+        StringRequest request = new StringRequest(Request.Method.GET, servicioValoracion+"?cod_establecimiento="+codEstablecimiento,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+
+                        Toast.makeText(getApplicationContext(),response.toString(),Toast.LENGTH_SHORT).show();
+
+
+
+
+                        try {
+
+
+                            JSONObject jsonObject = new JSONObject(response.toString());
+
+
+                                Toast.makeText(getApplicationContext(),"valoracion "+jsonObject.getDouble("general"),Toast.LENGTH_SHORT).show();
+                                calificacionPromedio.setRating((float)jsonObject.getDouble("general"));
+                                progress_bar_accesibilidad.setProgress(((int)jsonObject.getDouble("accesibilidad")*100)*2);
+                                progress_bar_comodidad.setProgress(((int)jsonObject.getDouble("comodidad")*100)*2);
+                                valoracion_centro_accesibilidad.setText(""+jsonObject.getDouble("accesibilidad"));
+                                valoracion_centro_comodidad.setText(""+jsonObject.getDouble("comodidad"));
 
                         } catch (JSONException e) {
                             e.printStackTrace();

@@ -86,7 +86,7 @@ public class InfoLugar extends AppCompatActivity {
     private SwitchCompat lavamanos ;
     private Button cargarImagenes;
 
-    private String servicio = "http://84c513c9.ngrok.io/InclusivApp/";
+    private String servicio = "http://a5343472.ngrok.io/InclusivApp/";
     private String dirEstablecimiento = "controllers/establecimiento.php";
     private String dirAccesibilidad = "controllers/accesibilidad.php";
     private String dirComodidad = "controllers/comodidad.php";
@@ -524,7 +524,7 @@ public class InfoLugar extends AppCompatActivity {
         bitmap.compress(Bitmap.CompressFormat.JPEG,100,stream);
 
         byte[] array = stream.toByteArray();
-        //imgsBit.add(Base64.encodeToString(array,0));
+        imgsBit.add(Base64.encodeToString(array,0));
 
 
     }

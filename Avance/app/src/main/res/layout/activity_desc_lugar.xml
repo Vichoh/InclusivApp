@@ -84,6 +84,10 @@
             android:theme="@style/RatingBar"
             android:layout_marginLeft="10dp"
             android:clickable="true"
+            android:focusableInTouchMode="false"
+            android:focusable="false"
+            android:isIndicator="true"
+
 
             />
 
@@ -144,8 +148,8 @@
                                 android:layout_gravity="center"
                                 android:theme="@style/progresBar"
                                 style="?android:attr/progressBarStyleHorizontal"
-                                android:max="10"
-                                android:progress="4"
+                                android:max="1000"
+                                android:progress="400"
                                 android:progressDrawable="@drawable/progress_circle"
                                 android:rotation="-90"
 
@@ -228,7 +232,7 @@
                             android:layout_gravity="center"
                             android:theme="@style/progresBar"
                             style="?android:attr/progressBarStyleHorizontal"
-                            android:max="10"
+                            android:max="1000"
                             android:progress="9"
                             android:progressDrawable="@drawable/progress_circle"
                             android:rotation="-90"
@@ -390,7 +394,7 @@
             android:background="@android:color/white"
             android:scrollbars="vertical"
             android:divider="@android:color/black"
-
+            t
 
              />
 
