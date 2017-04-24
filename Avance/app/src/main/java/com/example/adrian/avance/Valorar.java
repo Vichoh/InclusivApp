@@ -1,5 +1,6 @@
 package com.example.adrian.avance;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SwitchCompat;
@@ -140,7 +141,10 @@ public class Valorar extends AppCompatActivity {
                 uploadAccesibilidad (cod_Establecimiento);
                 uploadComodidad(cod_Establecimiento);
 
+                Intent intent = new Intent (getApplicationContext(), Principal.class);
 
+
+                startActivity(intent);
 
 
             }

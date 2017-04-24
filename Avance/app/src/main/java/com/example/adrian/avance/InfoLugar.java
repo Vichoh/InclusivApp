@@ -236,6 +236,10 @@ public class InfoLugar extends AppCompatActivity {
             public void onClick(View view) {
 
                 uploadEstablecimiento(nombreCategoria+"",""+yourLatitude,""+yourLongitude);
+                Intent intent = new Intent (getApplicationContext(), Principal.class);
+
+
+                startActivity(intent);
 
 
             }

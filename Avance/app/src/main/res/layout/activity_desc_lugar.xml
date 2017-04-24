@@ -309,7 +309,7 @@
             <View
                 android:layout_width="fill_parent"
                 android:layout_height="1dp"
-                android:background="@android:color/black"
+                android:background="#E0E0E0"
                 android:layout_marginTop="60dp"/>
 
 
@@ -317,7 +317,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="horizontal"
-                android:layout_marginTop="20dp">
+                android:layout_marginTop="10dp">
 
 
                 <TextView
@@ -376,10 +376,11 @@
             <View
                 android:layout_width="fill_parent"
                 android:layout_height="1dp"
-                android:background="@android:color/black"
-                android:layout_marginTop="100dp"
-                android:layout_marginBottom="100dp"
+                android:background="#E0E0E0"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
                 />
+
 
 
 
@@ -387,14 +388,50 @@
 
         </LinearLayout>
 
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+
+            <ImageView
+                android:layout_marginTop="30dp"
+                android:id="@+id/imageViewPhotoDesc"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:src="@drawable/usuario"
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true" />
+        </RelativeLayout>
+
+
+
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="1dp"
+            android:background="#E0E0E0"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="Comentarios"
+            android:layout_marginLeft="50px"
+            android:textSize="16dp"
+            android:textColor="@android:color/white"
+            android:layout_marginBottom="15dp"
+
+            />
+
         <ListView
             android:id="@+id/list_comentarios"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@android:color/white"
+            android:background="@color/colorPrimary"
             android:scrollbars="vertical"
             android:divider="@android:color/black"
-            t
+
 
              />
 

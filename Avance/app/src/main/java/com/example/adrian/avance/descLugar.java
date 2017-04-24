@@ -12,6 +12,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RatingBar;
@@ -25,6 +26,9 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.facebook.AccessToken;
+import com.facebook.Profile;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -35,6 +39,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import back.CircleTransform;
 import back.GaleriaAdaptador;
 import back.Rutas;
 
@@ -58,6 +63,7 @@ public class descLugar extends AppCompatActivity {
     private String codCategoria;
     private String  cod_establecimiento;
     private ListView list_comentarios;
+    private ImageView imageViewPhotoDesc;
 
     private ViewPager galeria;
     private ArrayAdapter<String> namesAA;
@@ -100,8 +106,7 @@ public class descLugar extends AppCompatActivity {
 
 
         nombreEstablecimiento.setText(getIntent().getStringExtra("nombreLugar"));
-        valoracion_centro_accesibilidad.setText(getIntent().getStringExtra("valoracion_centro_accesibilidad"));
-        valoracion_centro_comodidad.setText(getIntent().getStringExtra("valoracion_centro_comodidad"));
+
         direccionDesc.setText(getIntent().getStringExtra("direccionDesc"));
 
         telefonoDesc.setText(getIntent().getStringExtra("telefonoDesc"));
@@ -167,6 +172,16 @@ public class descLugar extends AppCompatActivity {
 
 
         cargarValoracion(codEstablecimiento);
+
+
+        if (AccessToken.getCurrentAccessToken() != null) {
+
+            Profile profileDefault = Profile.getCurrentProfile();
+            imageViewPhotoDesc = (ImageView) findViewById(R.id.imageViewPhoto);
+            Picasso.with(descLugar.this).load(profileDefault.getProfilePictureUri(100,100)).transform(new CircleTransform()).into(imageViewPhotoDesc);
+
+
+        }
     }
 
 
@@ -314,8 +329,8 @@ public class descLugar extends AppCompatActivity {
                                 calificacionPromedio.setRating((float)jsonObject.getDouble("general"));
                                 progress_bar_accesibilidad.setProgress(((int)jsonObject.getDouble("accesibilidad")*100)*2);
                                 progress_bar_comodidad.setProgress(((int)jsonObject.getDouble("comodidad")*100)*2);
-                                valoracion_centro_accesibilidad.setText(""+jsonObject.getDouble("accesibilidad"));
-                                valoracion_centro_comodidad.setText(""+jsonObject.getDouble("comodidad"));
+                                valoracion_centro_accesibilidad.setText(""+(int)jsonObject.getDouble("accesibilidad"));
+                                valoracion_centro_comodidad.setText(""+(int)jsonObject.getDouble("comodidad"));
 
                         } catch (JSONException e) {
                             e.printStackTrace();

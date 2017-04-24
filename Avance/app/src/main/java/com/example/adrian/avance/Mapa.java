@@ -226,16 +226,14 @@ public class Mapa extends Fragment implements OnMapReadyCallback, GoogleApiClien
 
 
 
-         LatLng MELBOURNE = new LatLng(Double.parseDouble(markerLatitud),Double.parseDouble( markerLongitud));
+         LatLng MELBOURNE = new LatLng(-38.746023,-72.617175);
         Marker melbourne = mapa.addMarker(new MarkerOptions()
                 .position(MELBOURNE)
                 .title("Alerta")
-                .snippet("Population: 4,137,400"));
+                .snippet("Calle en reparacion"));
         melbourne.showInfoWindow();
 
-         referencia = new LatLng(latitudReferencia,longitudReferencia);
-        mapa.addMarker(new MarkerOptions().position(referencia).title("Tu estas aquí")
-                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)).flat(true));
+
 
         mapa.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
             @Override
@@ -273,11 +271,7 @@ public class Mapa extends Fragment implements OnMapReadyCallback, GoogleApiClien
                 intent.putExtra("valoracion_centro_accesibilidad", establecimiento.getNombre());
                 intent.putExtra("valoracion_centro_comodidad", establecimiento.getNombre());
                 intent.putExtra("direccionDesc", establecimiento.getCalle());
-                intent.putExtra("horariDesc", establecimiento.getNombre());
                 intent.putExtra("telefonoDesc", establecimiento.getTelefono());
-                intent.putExtra("calificacionPromedio", establecimiento.getNombre());
-                intent.putExtra("progress_bar_accesibilidad", establecimiento.getNombre());
-                intent.putExtra("progress_bar_comodidad", establecimiento.getNombre());
                 intent.putExtra("lat", ""+marker.getPosition().latitude);
                 intent.putExtra("lon", ""+marker.getPosition().longitude);
                 intent.putExtra("myLat", ""+latitudReferencia);
